@@ -15,6 +15,7 @@ import ProfileImage from "@/../public/assets/images/main-profile.png";
 import ShareIcon from "@/../public/icons/share.svg";
 import LabelValueBlock from "../components/LabelValueBlock";
 import SendMessagePopup from "../components/SendMessagePopup";
+import PhotoSlider from "../components/PhotoSlider";
 
 /** Home Screen */
 const HomeScreen: React.FC = () => {
@@ -23,9 +24,9 @@ const HomeScreen: React.FC = () => {
   const [sendMessageVisible, setSendMessageVisible] = useState<boolean>(false);
 
   // Helper Functions
-const toggleSendPopup = () => {
-  setSendMessageVisible(prev => !prev);
-}
+  const toggleSendPopup = () => {
+    setSendMessageVisible(prev => !prev);
+  }
   
   return (
     <div className="bg-slate-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-slate-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-slate-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
@@ -101,9 +102,7 @@ const toggleSendPopup = () => {
       <div className="flex">
         {/* Boys Profile Image Wrapper */}
         <div className=" w-116 flex flex-col items-center gap-4 px-5 py-8 ">
-          <div className="rounded-3xl w-full">
-            <Image src={ProfileImage} alt="omkar" className="w-full" />
-          </div>
+          <PhotoSlider />
           {/* Button */}
           <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer" onClick={toggleSendPopup}>
             <Image src={ShareIcon} alt="share" />
