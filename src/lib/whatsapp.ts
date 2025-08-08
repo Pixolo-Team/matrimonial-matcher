@@ -205,14 +205,35 @@ export function buildPartialWhatsAppMessage(
 }
 
 /**
+ * Normalize a phone number for WhatsApp:
+ * - keep digits only
+ * - add default country code if missing (e.g., "91" for India)
+ */
+export function normalizePhone(raw?: string, defaultCountryCode = "91"): string | null {
+  if (!raw) return null;
+  const digits = raw.replace(/\D/g, ""); // strip non-digits
+  if (!digits) return null;
+
+  // Already has country code? (very rough check: 10-digit local assumed Indian)
+  if (digits.length > 10) return digits;
+
+  // If exactly 10 digits (India), prepend default country code
+  if (digits.length === 10) return defaultCountryCode + digits;
+
+  // Otherwise return as-is (you can add more rules if needed)
+  return digits;
+}
+
+/**
  * Optional: explicitly force Web WhatsApp on desktop.
  * (wa.me usually redirects correctly, but you can use this if you prefer.)
  */
 export function buildWebWhatsAppLink(message: string, phone?: string) {
   const encoded = encodeURIComponent(message);
-  // const normalized = normalizePhone(phone || "");
+  const normalized = normalizePhone(phone || "");
 
-  return `https://web.whatsapp.com/send?phone=918369377673&text=${encoded}`;
-
-  // return `https://web.whatsapp.com/send?text=${encoded}`;
+  if (normalized) {
+    return `https://web.whatsapp.com/send?phone=${normalized}&text=${encoded}`;
+  }
+  return `https://web.whatsapp.com/send?text=${encoded}`;
 }
