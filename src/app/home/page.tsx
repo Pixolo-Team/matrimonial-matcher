@@ -1,5 +1,6 @@
+"use client"
 // REACT //
-import React from "react";
+import React, { useState } from "react";
 
 // COMPONENTS //
 import Image from "next/image";
@@ -13,12 +14,25 @@ import ProfileImage from "@/../public/assets/images/main-profile.png";
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
 import LabelValueBlock from "../components/LabelValueBlock";
+import SendMessagePopup from "../components/SendMessagePopup";
 
 /** Home Screen */
 const HomeScreen: React.FC = () => {
+
   // Define States
+  const [sendMessageVisible, setSendMessageVisible] = useState<boolean>(false);
+
+  // Helper Functions
+const toggleSendPopup = () => {
+  setSendMessageVisible(prev => !prev);
+}
+  
   return (
     <div className="bg-slate-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-slate-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-slate-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
+      
+      {/* Popup that comes on Send Message */}
+      <SendMessagePopup isVisible={sendMessageVisible} onClose={()=>setSendMessageVisible(false)} sendTo={2342} user={{}} />
+      
       {/* Header Section  */}
       <div className=" flex gap-3.5 justify-between">
         {/* Boys Header */}
@@ -91,7 +105,7 @@ const HomeScreen: React.FC = () => {
             <Image src={ProfileImage} alt="omkar" className="w-full" />
           </div>
           {/* Button */}
-          <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer">
+          <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer" onClick={toggleSendPopup}>
             <Image src={ShareIcon} alt="share" />
             Send Girls Details
           </Button>
@@ -314,7 +328,6 @@ const HomeScreen: React.FC = () => {
               <LabelValueBlock label={"Any other details / Conditions"}>
                 <div className="flex gap-2.5 justify-center items-center">
                   <span className="text-lg font-normal text-n-600">Father: <span className="font-medium text-n-900">Shetty</span></span>
-                  <div className="flex justify-start items-start"></div>
                   <span className="text-lg font-normal text-n-600">Mother: <span className="font-medium text-n-900">Poojary</span></span>
                 </div>
               </LabelValueBlock>
@@ -324,9 +337,8 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-right">
               <LabelValueBlock label={"Any other details / Conditions"} align="right">
                 <div className="flex gap-2.5 justify-center items-center">
-                  <span className="text-lg font-normal text-n-600">Father:<span className="font-medium text-n-900">Shetty</span></span>
-                  <div className="flex justify-start items-start"></div>
-                  <span className="text-lg font-normal text-n-600">Mother:<span className="font-medium text-n-900">Poojary</span></span>
+                  <span className="text-lg font-normal text-n-600">Father: <span className="font-medium text-n-900">Shetty</span></span>
+                  <span className="text-lg font-normal text-n-600">Mother: <span className="font-medium text-n-900">Poojary</span></span>
                 </div>
               </LabelValueBlock>
             </div>
@@ -344,7 +356,7 @@ const HomeScreen: React.FC = () => {
             <Image src={ProfileImage} alt="omkar" className="w-full" />
           </div>
           {/* Button */}
-          <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer">
+          <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer" onClick={toggleSendPopup}>
             <Image src={ShareIcon} alt="share" />
             Send Boys Details
           </Button>
