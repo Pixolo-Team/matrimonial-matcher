@@ -12,6 +12,7 @@ import ProfileImage from "@/../public/assets/images/main-profile.png";
 
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
+import LabelValueBlock from "../components/LabelValueBlock";
 
 /** Home Screen */
 const HomeScreen: React.FC = () => {
@@ -97,7 +98,7 @@ const HomeScreen: React.FC = () => {
         </div>
         <div className="w-2/3 flex flex-col py-8">
           {/* Box 1  */}
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5 ">
+          <div className="interactive-card ">
             {/* Boy Title */}
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-n-900">
@@ -111,6 +112,9 @@ const HomeScreen: React.FC = () => {
                 Rahul Shetty
               </span>
             </div>
+
+
+            {/* MATCH SCORE */}
             <div
               className="w-24 h-24 absolute  left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-0 p-5 
     before:content-[''] before:w-full before:h-full 
@@ -123,12 +127,12 @@ const HomeScreen: React.FC = () => {
             <span className="no-match-reason">Less than</span>
             <span className="yes-match-reason">More than</span>
           </div>
-          <div className=" relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5 ">
-            {/* DOB Title */}
-            <div className="flex flex-col w-1/2">
-              <span className="text-sm font-medium text-n-500">
-                Date of Birth
-              </span>
+          
+          {/* DOB */}
+          <div className=" interactive-card ">
+            {/* Boy - DOB */}
+            <div className="label-value-container-left">
+            <LabelValueBlock label="Date of Birth">
               <div className="flex flex-col  justify-start items-start">
                 <div className="flex gap-2 justify-center items-center">
                   <span className="text-lg font-medium text-n-900">
@@ -148,12 +152,13 @@ const HomeScreen: React.FC = () => {
                   </span>
                 </div>
               </div>
+            </LabelValueBlock>
             </div>
-            <div className="flex flex-col w-1/2 items-end">
-              <span className="text-sm font-medium text-n-500">
-                Date of Birth
-              </span>
-              <div className="flex flex-col  justify-start items-end text-right">
+
+            {/* Girl - DOB */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label="Date of Birth" align="right">
+              <div className="flex flex-col  justify-start items-end">
                 <div className="flex gap-2 justify-center items-center">
                   <span className="text-lg font-medium text-n-900">
                     15th March 1993
@@ -172,181 +177,168 @@ const HomeScreen: React.FC = () => {
                   </span>
                 </div>
               </div>
+            </LabelValueBlock>
             </div>
             <span className="no-match-reason">Less than</span>
             <span className="yes-match-reason">More than</span>
           </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5 yes-match">
-            {/* DOB Title */}
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Height</span>
-              <span className="text-lg font-medium text-n-900">175 cm</span>
+
+
+          {/* HEIGHT */}
+          <div className="interactive-card yes-match">
+            
+            {/* Boy Height */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"Height"} value={"182 cm"} />
             </div>
-            <div className="flex flex-col w-1/2  justify-start items-end">
-              <span className="text-sm font-medium text-n-500">Height</span>
-              <span className="text-lg font-medium text-n-900">175 cm</span>
+
+            {/* Girl Height */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"Height"} value={"172 cm"} align="right"  />
             </div>
+
+            {/* Reasons for Yes / No */}
             <span className="no-match-reason">Less than</span>
             <span className="yes-match-reason">More than</span>
           </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5">
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Nakshatra | Rashi
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Ashwini | Mesha (Aries)
-              </span>
+
+          {/* NAKSHATRA / RASHI */}
+          <div className="interactive-card">
+
+            {/* Boy */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"Nakshatra | Rashi"} value={"Ashwini | Mesha (Aries)"} />
             </div>
-            <div className="flex flex-col w-1/2  justify-start items-end">
-              <span className="text-sm font-medium text-n-500">
-                Nakshatra | Rashi
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Ashwini | Mesha (Aries)
-              </span>
+
+            {/* Girl */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"Nakshatra | Rashi"} value={"Ashwini | Mesha (Aries)"} align="right" />
             </div>
+          </div>
+
+          {/* EDUCATION */}
+          <div className="interactive-card">
+            {/* Boy */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"Education"} value={"B.E. (Computer Science)"} />
+            </div>
+
+            {/* Girl */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"Education"} value={"B.E. (Computer Science)"} align="right" />
+            </div>
+          </div>
+
+          {/* WORKING / OWN VENTURE */}
+          <div className="interactive-card">
+            {/* Boy */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"Working / Own Venture"} value={"Working"} />
+            </div>
+
+            {/* Girl */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"Working / Own Venture"} value={"Working"} align="right" />
+            </div>
+          </div>
+
+          {/* WORKING LOCATION */}
+          <div className="interactive-card">
+            {/* Boy */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"Working Location"} value={"Mumbai"} />
+            </div>
+
+            {/* Girl */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"Working Location"} value={"Mumbai"} align="right" />
+            </div>
+
+          {/* Match Reasons */}
             <span className="no-match-reason">Less than</span>
             <span className="yes-match-reason">More than</span>
           </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5 no-match">
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Education</span>
-              <span className="text-lg font-medium text-n-900">
-                B.E. (Computer Science), MBA (Marketing)
-              </span>
+
+          {/* SALARY */}
+          <div className="interactive-card">
+            {/* Boy */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"Salary PM"} value={"80,000"} />
             </div>
-            <div className="flex flex-col w-1/2  justify-start items-end text-right">
-              <span className="text-sm font-medium text-n-500">Education</span>
-              <span className="text-lg font-medium text-n-900">
-                B.E. (Computer Science), MBA (Marketing)
-              </span>
+
+            {/* Girl */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"Salary PM"} value={"80,000"} align="right" />
             </div>
+
+            {/* Match Reasons */}
             <span className="no-match-reason">Less than</span>
             <span className="yes-match-reason">More than</span>
           </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5">
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Working / Own Venture
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Working (Product Manager ay Infosys)
-              </span>
+
+          {/* 1ST MARRIAGE / DIVORCEE */}
+          <div className="interactive-card">
+            {/* Boy */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"1st Marriage / Divorcee"} value={"1st Marriage"} />
             </div>
-            <div className="flex flex-col w-1/2  justify-start items-end">
-              <span className="text-sm font-medium text-n-500">
-                Working / Own Venture
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Working (Product Manager ay Infosys)
-              </span>
+
+            {/* Girl */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"1st Marriage / Divorcee"} value={"1st Marriage"} align="right" />
             </div>
+
+            {/* Match Reasons */}
             <span className="no-match-reason">Less than</span>
             <span className="yes-match-reason">More than</span>
           </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5">
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Working Location
-              </span>
-              <span className="text-lg font-medium text-n-900">Mumbai</span>
+
+          {/* OTHER DETAILS */}
+          <div className="interactive-card">
+            {/* Boy */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"Any other details / Conditions"} value={"I want to get married"} />
             </div>
-            <div className="flex flex-col w-1/2  justify-start items-end">
-              <span className="text-sm font-medium text-n-500">
-                Working Location
-              </span>
-              <span className="text-lg font-medium text-n-900">Mumbai</span>
+
+            {/* Girl */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"Any other details / Conditions"} value={"I want to get married"} align="right" />
             </div>
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
           </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5">
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Salary Per Month
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Rs. 1,80,000
-              </span>
+
+
+          <div className="interactive-card">
+
+            {/* Boy */}
+            <div className="label-value-container-left">
+              <LabelValueBlock label={"Any other details / Conditions"}>
+                <div className="flex gap-2.5 justify-center items-center">
+                  <span className="text-lg font-normal text-n-600">Father: <span className="font-medium text-n-900">Shetty</span></span>
+                  <div className="flex justify-start items-start"></div>
+                  <span className="text-lg font-normal text-n-600">Mother: <span className="font-medium text-n-900">Poojary</span></span>
+                </div>
+              </LabelValueBlock>
             </div>
-            <div className="flex flex-col w-1/2  justify-start items-end">
-              <span className="text-sm font-medium text-n-500">
-                Salary Per Month
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Rs. 1,80,000
-              </span>
+
+            {/* Girl */}
+            <div className="label-value-container-right">
+              <LabelValueBlock label={"Any other details / Conditions"} align="right">
+                <div className="flex gap-2.5 justify-center items-center">
+                  <span className="text-lg font-normal text-n-600">Father:<span className="font-medium text-n-900">Shetty</span></span>
+                  <div className="flex justify-start items-start"></div>
+                  <span className="text-lg font-normal text-n-600">Mother:<span className="font-medium text-n-900">Poojary</span></span>
+                </div>
+              </LabelValueBlock>
             </div>
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
-          </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5">
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                1st Marriage / Divorcee
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                1st Marriage
-              </span>
-            </div>
-            <div className="flex flex-col w-1/2  justify-start items-end text-right">
-              <span className="text-sm font-medium text-n-500">
-                1st Marriage / Divorcee
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                1st Marriage
-              </span>
-            </div>
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
-          </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5">
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Any other Details / Conditions
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Prefers partner settled in Karnataka or abroad
-              </span>
-            </div>
-            <div className="flex flex-col w-1/2  justify-start items-end text-right">
-              <span className="text-sm font-medium text-n-500">
-                Any other Details / Conditions
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Prefers partner settled in Karnataka or abroad
-              </span>
-            </div>
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
-          </div>
-          <div className="relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5">
-            <div className="flex flex-col w-1/2  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Bari</span>
-              <div className="flex gap-2.5 justify-center items-center">
-                <span className="text-lg font-normal text-n-600">Father:</span>
-                <span className="text-lg font-medium text-n-900">Shetty</span>
-                <div className="flex justify-start items-start"></div>
-                <span className="text-lg font-normal text-n-600">Mother:</span>
-                <span className="text-lg font-medium text-n-900">Poojary</span>
-              </div>
-            </div>
-            <div className="flex flex-col w-1/2  justify-start items-end text-right">
-              <span className="text-sm font-medium text-n-500">Bari</span>
-              <div className="flex gap-2.5 justify-center items-center">
-                <span className="text-lg font-normal text-n-600">Father:</span>
-                <span className="text-lg font-medium text-n-900">Shetty</span>
-                <div className="flex justify-start items-start"></div>
-                <span className="text-lg font-normal text-n-600">Mother:</span>
-                <span className="text-lg font-medium text-n-900">Poojary</span>
-              </div>
-            </div>
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
+
+            {/* Match Reasons */}
+            <span className="no-match-reason">Is same as</span>
+            <span className="yes-match-reason">Is different than</span>
           </div>
         </div>
-        {/* Girls Profile Image Wrapper */}
+
+
+        {/* GIRLS PHOTO SIDE */}
         <div className="w-116 flex flex-col items-center gap-4 px-5 py-8">
           <div className="rounded-3xl w-full">
             <Image src={ProfileImage} alt="omkar" className="w-full" />
@@ -358,7 +350,9 @@ const HomeScreen: React.FC = () => {
           </Button>
         </div>
       </div>
-      {/* Separation */}
+
+
+      {/* Separation Line */}
       <div className="flex justify-between gap-3.5 ">
         <div className="w-1/2 h-px px-12">
           <div className=" h-px bg-slate-300"></div>
@@ -367,105 +361,77 @@ const HomeScreen: React.FC = () => {
           <div className=" h-px bg-slate-300"></div>
         </div>
       </div>
-      {/* Parents Details Section */}
+
+
+      {/* PARENTS DETAILS */}
       <div className=" px-5 py-8 flex justify-between gap-3.5 ">
-        {/* Boy Side Details */}
+
+
+        {/* Boy Side Parents */}
         <div className="flex w-1/2 gap-12 px-5 items-center">
+
+        {/* Father Details */}
           <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
             <span className="text-xl font-semibold text-n-900 p-with-before">
               Father’s Details
             </span>
-            <div className="flex flex-col  justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Name</span>
-              <span className="text-lg font-medium text-n-900">
-                Anand Shetty
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Employee Details
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Retired - Government Officer
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Bari</span>
-              <span className="text-lg font-medium text-n-900">Shetty</span>
-            </div>
+
+            {/* Boy - Father Name */}
+            <LabelValueBlock label="Name" value="Anand Shetty" />
+
+            {/* Boy - Father Employee Details */}
+            <LabelValueBlock label="Employee Details" value="Retired - Government Officer" />
           </div>
+
+          {/* Separater */}
           <span className="w-px h-4/5 bg-slate-300"></span>
+
+          {/* Mother Details */}
           <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
             <span className="text-xl font-semibold text-n-900 p-with-before">
               Mother’s Details
             </span>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Name</span>
-              <span className="text-lg font-medium text-n-900">
-                Sunita Shetty
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Employee Details
-              </span>
-              <span className="text-lg font-medium text-n-900">Homemaker</span>
-            </div>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Bari</span>
-              <span className="text-lg font-medium text-n-900">Poojary</span>
-            </div>
+            {/* Boy - Mother Name */}
+            <LabelValueBlock label="Name" value="Anand Shetty" />
+
+            {/* Boy - Mother Employee Details */}
+            <LabelValueBlock label="Employee Details" value="Retired - Government Officer" />
           </div>
         </div>
-        {/* Girl Side Details */}
+
+        {/* Girl Side Parents */}
         <div className="flex w-1/2 gap-12 px-5 items-center">
+
+        {/* Father Details */}
           <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
             <span className="text-xl font-semibold text-n-900 p-with-before">
               Father’s Details
             </span>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Name</span>
-              <span className="text-lg font-medium text-n-900">
-                Anand Shetty
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Employee Details
-              </span>
-              <span className="text-lg font-medium text-n-900">
-                Retired - Government Officer
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Bari</span>
-              <span className="text-lg font-medium text-n-900">Shetty</span>
-            </div>
+
+            {/* Boy - Father Name */}
+            <LabelValueBlock label="Name" value="Anand Shetty" />
+
+            {/* Boy - Father Employee Details */}
+            <LabelValueBlock label="Employee Details" value="Retired - Government Officer" />
           </div>
+
+          {/* Separater */}
           <span className="w-px h-4/5 bg-slate-300"></span>
+
+          {/* Mother Details */}
           <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
             <span className="text-xl font-semibold text-n-900 p-with-before">
               Mother’s Details
             </span>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Name</span>
-              <span className="text-lg font-medium text-n-900">
-                Sunita Shetty
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">
-                Employee Details
-              </span>
-              <span className="text-lg font-medium text-n-900">Homemaker</span>
-            </div>
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Bari</span>
-              <span className="text-lg font-medium text-n-900">Poojary</span>
-            </div>
+            {/* Boy - Mother Name */}
+            <LabelValueBlock label="Name" value="Anand Shetty" />
+
+            {/* Boy - Mother Employee Details */}
+            <LabelValueBlock label="Employee Details" value="Retired - Government Officer" />
           </div>
         </div>
       </div>
+
       {/* Separation */}
       <div className="flex justify-between gap-3.5 ">
         <div className="w-1/2 h-px px-12">
@@ -475,32 +441,36 @@ const HomeScreen: React.FC = () => {
           <div className=" h-px bg-slate-300"></div>
         </div>
       </div>
+
       {/* Footer Section */}
       <div className=" px-5 py-8 flex gap-3.5">
+
+        {/* BOY - Contact Details */}
         <div className="flex flex-col w-1/2 gap-2.5 px-5 justify-start items-start">
           <span className="text-xl font-semibold text-n-900 p-with-before">
             Contact Details
           </span>
           <div className="flex gap-7 justify-start items-center">
+
+            {/* ADDRESS */}
             <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Address</span>
-              <span className="text-lg font-medium text-n-900">
-                Shivbagh, Kadri, Mangalore - 575002
-              </span>
+              <LabelValueBlock label="Address" value="Shivbagh, Kadri, Mangalore - 57002" />
             </div>
-            <div className="flex justify-start items-start"></div>
+
+            {/* EMAIL */}
             <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Email</span>
-              <Link href={"#"}>
+              <LabelValueBlock label="Email">
+                <Link href={"#"}>
                 <span className="text-lg font-medium text-n-900">
                   rahul.shetty@gmail.com
                 </span>
               </Link>
+              </LabelValueBlock>
             </div>
-            <div className="flex justify-start items-start"></div>
+
+            {/* MOBILE */}
             <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Mobile</span>
-              <div className="flex gap-1">
+              <LabelValueBlock label="Mobile">
                 <Link href="tel:9845012345">
                   <span className="text-lg font-medium text-n-900">
                     9845012345
@@ -512,34 +482,38 @@ const HomeScreen: React.FC = () => {
                     9741567890
                   </span>
                 </Link>
-              </div>
+                </LabelValueBlock>
             </div>
+
           </div>
         </div>
+
+        {/* Girl - Contact Details */}
         <div className="flex flex-col w-1/2 gap-2.5 px-5 justify-start items-start">
           <span className="text-xl font-semibold text-n-900 p-with-before">
             Contact Details
           </span>
           <div className="flex gap-7 justify-start items-center">
+
+            {/* ADDRESS */}
             <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Address</span>
-              <span className="text-lg font-medium text-n-900">
-                Shivbagh, Kadri, Mangalore - 575002
-              </span>
+              <LabelValueBlock label="Address" value="Shivbagh, Kadri, Mangalore - 57002" />
             </div>
-            <div className="flex justify-start items-start"></div>
+
+            {/* EMAIL */}
             <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Email</span>
-              <Link href={"#"}>
+              <LabelValueBlock label="Email">
+                <Link href={"#"}>
                 <span className="text-lg font-medium text-n-900">
                   rahul.shetty@gmail.com
                 </span>
               </Link>
+              </LabelValueBlock>
             </div>
-            <div className="flex justify-start items-start"></div>
+
+            {/* MOBILE */}
             <div className="flex flex-col gap-1 justify-start items-start">
-              <span className="text-sm font-medium text-n-500">Mobile</span>
-              <div className="flex gap-1">
+              <LabelValueBlock label="Mobile">
                 <Link href="tel:9845012345">
                   <span className="text-lg font-medium text-n-900">
                     9845012345
@@ -551,10 +525,12 @@ const HomeScreen: React.FC = () => {
                     9741567890
                   </span>
                 </Link>
-              </div>
+                </LabelValueBlock>
             </div>
+            
           </div>
         </div>
+
       </div>
     </div>
   );

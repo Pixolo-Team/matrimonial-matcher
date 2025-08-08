@@ -198,6 +198,25 @@
   }
 }
 
+.label-value-container-right {
+  @apply flex flex-col w-1/2 justify-start items-end;
+}
+.label-value-container-left {
+  @apply flex flex-col w-1/2 justify-start items-start;
+}
+
+.interactive-card {
+  @apply relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5;
+}
+
+.no-match {
+    @apply border-[3px] border-red-500 bg-red-100;
+  }
+
+  .yes-match {
+    @apply border-[3px] border-green-500 bg-green-100;
+  }
+
 @layer components {
   .p-with-before {
     @apply relative; /* Needed so ::before is positioned relative to the P */
@@ -216,16 +235,12 @@
     .yes-match-reason {
       @apply hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-500 px-2 py-1 text-sm text-slate-50;
     }
+
+    
 }
 
 @layer utilities {
-  .no-match {
-    @apply border-[3px] border-red-500 bg-red-100;
-  }
-
-  .yes-match {
-    @apply border-[3px] border-green-500 bg-green-100;
-  }
+  
 
   /* Show reason divs only when parent has the class */
   .no-match .no-match-reason {
@@ -242,3 +257,5 @@
     @apply hidden;
   }
 }
+
+
