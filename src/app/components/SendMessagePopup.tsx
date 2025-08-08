@@ -34,7 +34,7 @@ export default function SendMessagePopup({ isVisible, onClose, sendTo, user }: S
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 bg-black bg-opacity-30 flex justify-center items-center"
+      className="fixed inset-0 z-50 bg-slate-800 bg-opacity-30 flex justify-center items-center"
     >
       <div className="bg-white px-10 py-6 rounded-xl w-[90%] max-w-sm animate-fadeIn shadow-lg">
         <div className="flex flex-col items-center gap-11">
@@ -44,7 +44,7 @@ export default function SendMessagePopup({ isVisible, onClose, sendTo, user }: S
           {/* Button Stack */}
           <div className="flex flex-col gap-5 w-full">
             {/* Send Basic Details */}
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer">
+            <Button className="bg-slate-50 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer">
                 <Image src={ShareIcon} alt="share" />
                 Send Basic Details
             </Button>
