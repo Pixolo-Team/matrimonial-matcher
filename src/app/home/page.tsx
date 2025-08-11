@@ -18,7 +18,11 @@ import SliderArrow from "../components/SliderArrow";
 import { SHEET_URL } from "@/constants";
 
 // UTILS //
-import { calculateCompatibilityRating, Profile } from "@/lib/matchmaking.util";
+import {
+  calculateCompatibilityRating,
+  checkMatch,
+  Profile,
+} from "@/lib/matchmaking.util";
 
 // OTHERS //
 import { fetchSheetData } from "@/lib/google-sheet";
@@ -29,8 +33,7 @@ import {
 } from "@/lib/whatsapp";
 
 // IMAGES //
-import UserThumbImage from "@/../public/assets/images/user-photo.png";
-import ProfileImage from "@/../public/assets/images/main-profile.png";
+import ProfileImage from "@/../public/assets/images/main-profile.webp";
 
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
@@ -43,9 +46,10 @@ const HomeScreen: React.FC = () => {
   const [femaleProfiles, setFemaleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [whatsappMessage, setWhatsappMessage] = useState<string>("");
-  const [selectedMale, setSelectedMale] = useState<Profile | null>(null);
-  const [selectedFemale, setSelectedFemale] = useState<Profile | null>(null);
+  const [selectedMaleIndex, setSelectedMaleIndex] = useState<number>(0);
+  const [selectedFemaleIndex, setSelectedFemaleIndex] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const [compatibilityRating, setCompatibilityRating] = useState<number>(0);
 
   // Helper Functions
   const [boysRef, boysApi] = useEmblaCarousel({
@@ -99,35 +103,6 @@ const HomeScreen: React.FC = () => {
 
       setMaleProfiles(males);
       setFemaleProfiles(females);
-
-      // Set the first Male
-      males.length > 0 ? setSelectedMale(males[0]) : null;
-
-      // Set first Female
-      females.length > 0 ? setSelectedFemale(females[0]) : null;
-
-      // Example compatibility test (can be removed or moved to button action)
-      const rating = calculateCompatibilityRating(
-        {
-          name: "Rahul",
-          age: "30",
-          salary_pm: "90000",
-          mother_bari: "Bharadwaj",
-          working_location: "Mumbai",
-          is_divorced: "No",
-          height: "178",
-        },
-        {
-          name: "Priya",
-          age: "37",
-          salary_pm: "50000",
-          mother_bari: "Bharadwaj",
-          working_location: "Mumbai",
-          is_divorced: "No",
-          height: "185",
-        }
-      );
-      console.log(`Compatibility Rating: ${rating}%`);
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -135,9 +110,25 @@ const HomeScreen: React.FC = () => {
     }
   }, []);
 
+  /** Calculate Compatibility Rating */
+  const calculateRating = useCallback(async () => {
+    const score = Number(
+      calculateCompatibilityRating(
+        maleProfiles[selectedMaleIndex],
+        femaleProfiles[selectedFemaleIndex]
+      )
+    );
+    setCompatibilityRating(Number.isFinite(score) ? score : 0);
+  }, [femaleProfiles, maleProfiles, selectedFemaleIndex, selectedMaleIndex]);
+
   useEffect(() => {
     loadAndProcessData();
   }, [loadAndProcessData]);
+
+  // Recalculate rating on every profile change
+  useEffect(() => {
+    calculateRating();
+  }, [calculateRating]);
 
   return (
     <div className="bg-slate-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-slate-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-slate-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
@@ -154,103 +145,78 @@ const HomeScreen: React.FC = () => {
         {/* Boys Header */}
         <div className="relative flex w-1/2 py-2 px-9 overflow-hidden">
           {/* Slider Arrow Component - Right*/}
-          <div
-            className="absolute top-1/2 left-3 -translate-y-1/2 z-10"
-            onClick={() => boysApi?.scrollPrev()}
-          >
-            <SliderArrow direction="left" />
-          </div>
+          {maleProfiles.length > 3 && (
+            <div
+              className="absolute top-1/2 left-3 -translate-y-1/2 z-10"
+              onClick={() => boysApi?.scrollPrev()}
+            >
+              <SliderArrow direction="left" />
+            </div>
+          )}
           <div className="overflow-hidden w-full" ref={boysRef}>
             <div className="flex gap-3.5">
               {/* Boy Header Chip Component */}
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-                isActive
-              />
-              {/* Boy Header Chip Component */}
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-              />
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-              />
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-              />
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-              />
+              {maleProfiles.map((male, index) => {
+                return (
+                  <HeaderUserChip
+                    key={index + male.name}
+                    src={male.photo_1}
+                    name={male.name ?? "Candidate Name"}
+                    age={male.age}
+                    isActive={selectedMaleIndex === index}
+                    onClick={() => setSelectedMaleIndex(index)}
+                  />
+                );
+              })}
             </div>
           </div>
           {/* Slider Arrow Component - Right */}
-          <div
-            className="absolute top-1/2 right-3 -translate-y-1/2 z-10"
-            onClick={() => boysApi?.scrollNext()}
-          >
-            <SliderArrow direction="right" />
-          </div>
+          {maleProfiles.length > 3 && (
+            <div
+              className="absolute top-1/2 right-3 -translate-y-1/2 z-10"
+              onClick={() => boysApi?.scrollNext()}
+            >
+              <SliderArrow direction="right" />
+            </div>
+          )}
         </div>
         {/* Girls Header */}
         <div className="relative flex w-1/2 py-2 px-9">
           {/* Slider Arrow Component - Left */}
-          <div
-            className="absolute top-1/2 left-3 -translate-y-1/2 z-10"
-            onClick={() => girlsApi?.scrollPrev()}
-          >
-            <SliderArrow direction="left" />
-          </div>
+          {femaleProfiles.length > 3 && (
+            <div
+              className="absolute top-1/2 left-3 -translate-y-1/2 z-10"
+              onClick={() => girlsApi?.scrollPrev()}
+            >
+              <SliderArrow direction="left" />
+            </div>
+          )}
           <div className="overflow-hidden w-full" ref={girlsRef}>
             <div className="flex gap-3.5 ">
               {/* Girl Header Chip Component */}
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-                isActive
-              />
-              {/* Girl Header Chip Component */}
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-              />
-              {/* Girl Header Chip Component */}
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-              />
-              {/* Girl Header Chip Component */}
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-              />
-              {/* Girl Header Chip Component */}
-              <HeaderUserChip
-                img={UserThumbImage}
-                name="Rahul Shetty"
-                age="33"
-              />
+              {femaleProfiles.map((female, index) => {
+                return (
+                  <HeaderUserChip
+                    key={index + female.name}
+                    src={female.photo_1}
+                    name={female.name ?? "Candidate Name"}
+                    age={female.age}
+                    isActive={selectedFemaleIndex === index}
+                    onClick={() => setSelectedFemaleIndex(index)}
+                  />
+                );
+              })}
             </div>
           </div>
           {/* Slider Arrow Component - Right */}
-          <div
-            className="absolute top-1/2 right-3 -translate-y-1/2"
-            onClick={() => girlsApi?.scrollNext()}
-          >
-            <SliderArrow direction="right" />
-          </div>
+          {femaleProfiles.length > 3 && (
+            <div
+              className="absolute top-1/2 right-3 -translate-y-1/2"
+              onClick={() => girlsApi?.scrollNext()}
+            >
+              <SliderArrow direction="right" />
+            </div>
+          )}
         </div>
       </div>
       {/* Separation */}
@@ -271,7 +237,8 @@ const HomeScreen: React.FC = () => {
           <Button
             className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
             onClick={() => {
-              selectedFemale && initSendMessage(selectedFemale);
+              if (selectedFemaleIndex)
+                initSendMessage(femaleProfiles[selectedFemaleIndex]);
             }}
           >
             <Image src={ShareIcon} alt="share" />
@@ -284,46 +251,52 @@ const HomeScreen: React.FC = () => {
             {/* Boy Title */}
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-n-900">
-                {selectedMale?.name}
+                {maleProfiles[selectedMaleIndex]?.name}
               </span>
               <span className="size-3 bg-yellow-500 rounded-full"></span>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="size-3 bg-yellow-500 rounded-full"></span>
               <span className="text-3xl font-bold text-n-900">
-                {selectedFemale?.name}
+                {femaleProfiles[selectedFemaleIndex]?.name}
               </span>
             </div>
 
             {/* Match Score Badge Component */}
-            <MatchBadge score={69} />
+            <MatchBadge score={compatibilityRating} />
           </div>
 
           {/* DOB */}
-          <div className=" interactive-card ">
+          <div
+            className={`interactive-card ${checkMatch(
+              "age",
+              maleProfiles[selectedMaleIndex]?.age,
+              femaleProfiles[selectedFemaleIndex]?.age
+            )}`}
+          >
             {/* Boy - DOB */}
             <div className="label-value-container-left">
               <LabelValueBlock label="Date of Birth">
                 <div className="flex flex-col  justify-start items-start">
                   <div className="flex gap-2 justify-center items-center">
                     <span className="text-lg font-medium text-n-900">
-                      {selectedMale?.date_of_birth}
+                      {maleProfiles[selectedMaleIndex]?.date_of_birth}
                     </span>
                     <span className="text-xl font-medium text-n-600">
-                      ({selectedMale?.age})
+                      ({maleProfiles[selectedMaleIndex]?.age})
                     </span>
                   </div>
                   <div className="flex gap-2.5 justify-start items-center">
                     <span className="text-sm font-normal text-n-900">
-                      {selectedMale?.birth_day}
+                      {maleProfiles[selectedMaleIndex]?.birth_day}
                     </span>
                     <div className="flex justify-start items-start"></div>
                     <span className="text-sm font-normal text-n-900">
-                      {selectedMale?.birth_time}
+                      {maleProfiles[selectedMaleIndex]?.birth_time}
                     </span>
                     <div className="flex justify-start items-start"></div>
                     <span className="text-sm font-normal text-n-900">
-                      {selectedMale?.birth_place}
+                      {maleProfiles[selectedMaleIndex]?.birth_place}
                     </span>
                   </div>
                 </div>
@@ -336,23 +309,23 @@ const HomeScreen: React.FC = () => {
                 <div className="flex flex-col  justify-start items-end">
                   <div className="flex gap-2 justify-center items-center">
                     <span className="text-lg font-medium text-n-900">
-                      {selectedFemale?.date_of_birth}
+                      {femaleProfiles[selectedFemaleIndex]?.date_of_birth}
                     </span>
                     <span className="text-xl font-medium text-n-600">
-                      ({selectedFemale?.age})
+                      ({femaleProfiles[selectedFemaleIndex]?.age})
                     </span>
                   </div>
                   <div className="flex gap-2.5 justify-start items-center">
                     <span className="text-sm font-normal text-n-900">
-                      {selectedFemale?.birth_day}
+                      {femaleProfiles[selectedFemaleIndex]?.birth_day}
                     </span>
                     <div className="flex justify-start items-start"></div>
                     <span className="text-sm font-normal text-n-900">
-                      {selectedFemale?.birth_time}
+                      {femaleProfiles[selectedFemaleIndex]?.birth_time}
                     </span>
                     <div className="flex justify-start items-start"></div>
                     <span className="text-sm font-normal text-n-900">
-                      {selectedFemale?.birth_place}
+                      {femaleProfiles[selectedFemaleIndex]?.birth_place}
                     </span>
                   </div>
                 </div>
@@ -363,17 +336,26 @@ const HomeScreen: React.FC = () => {
           </div>
 
           {/* HEIGHT */}
-          <div className="interactive-card yes-match">
+          <div
+            className={`interactive-card ${checkMatch(
+              "height",
+              maleProfiles[selectedMaleIndex]?.height,
+              femaleProfiles[selectedFemaleIndex]?.height
+            )}`}
+          >
             {/* Boy Height */}
             <div className="label-value-container-left">
-              <LabelValueBlock label={"Height"} value={selectedMale?.height} />
+              <LabelValueBlock
+                label={"Height"}
+                value={maleProfiles[selectedMaleIndex]?.height}
+              />
             </div>
 
             {/* Girl Height */}
             <div className="label-value-container-right">
               <LabelValueBlock
                 label={"Height"}
-                value={selectedFemale?.height}
+                value={femaleProfiles[selectedFemaleIndex]?.height}
                 align="right"
               />
             </div>
@@ -389,7 +371,7 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-left">
               <LabelValueBlock
                 label={"Nakshatra | Rashi"}
-                value={`${selectedMale?.nakshatra} | ${selectedMale?.rashi}`}
+                value={`${maleProfiles[selectedMaleIndex]?.nakshatra} | ${maleProfiles[selectedMaleIndex]?.rashi}`}
               />
             </div>
 
@@ -397,7 +379,7 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-right">
               <LabelValueBlock
                 label={"Nakshatra | Rashi"}
-                value={`${selectedFemale?.nakshatra} | ${selectedFemale?.rashi}`}
+                value={`${femaleProfiles[selectedFemaleIndex]?.nakshatra} | ${femaleProfiles[selectedFemaleIndex]?.rashi}`}
                 align="right"
               />
             </div>
@@ -409,7 +391,7 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-left">
               <LabelValueBlock
                 label={"Education"}
-                value={selectedMale?.edu_qualifications}
+                value={maleProfiles[selectedMaleIndex]?.edu_qualifications}
               />
             </div>
 
@@ -417,7 +399,7 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-right">
               <LabelValueBlock
                 label={"Education"}
-                value={selectedFemale?.edu_qualifications}
+                value={femaleProfiles[selectedFemaleIndex]?.edu_qualifications}
                 align="right"
               />
             </div>
@@ -429,7 +411,7 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-left">
               <LabelValueBlock
                 label={"Working / Own Venture"}
-                value={selectedMale?.working_or_own_venture}
+                value={maleProfiles[selectedMaleIndex]?.working_or_own_venture}
               />
             </div>
 
@@ -437,7 +419,9 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-right">
               <LabelValueBlock
                 label={"Working / Own Venture"}
-                value={selectedFemale?.working_or_own_venture}
+                value={
+                  femaleProfiles[selectedFemaleIndex]?.working_or_own_venture
+                }
                 align="right"
               />
             </div>
@@ -449,7 +433,7 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-left">
               <LabelValueBlock
                 label={"Working Location"}
-                value={selectedMale?.working_location}
+                value={maleProfiles[selectedMaleIndex]?.working_location}
               />
             </div>
 
@@ -457,7 +441,7 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-right">
               <LabelValueBlock
                 label={"Working Location"}
-                value={selectedFemale?.working_location}
+                value={femaleProfiles[selectedFemaleIndex]?.working_location}
                 align="right"
               />
             </div>
@@ -468,12 +452,18 @@ const HomeScreen: React.FC = () => {
           </div>
 
           {/* SALARY */}
-          <div className="interactive-card">
+          <div
+            className={`interactive-card ${checkMatch(
+              "height",
+              maleProfiles[selectedMaleIndex]?.salary_pm,
+              femaleProfiles[selectedFemaleIndex]?.salary_pm
+            )}`}
+          >
             {/* Boy */}
             <div className="label-value-container-left">
               <LabelValueBlock
                 label={"Salary PM"}
-                value={selectedMale?.salary_pm}
+                value={maleProfiles[selectedMaleIndex]?.salary_pm}
               />
             </div>
 
@@ -481,7 +471,7 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-right">
               <LabelValueBlock
                 label={"Salary PM"}
-                value={selectedFemale?.salary_pm}
+                value={femaleProfiles[selectedFemaleIndex]?.salary_pm}
                 align="right"
               />
             </div>
@@ -498,9 +488,9 @@ const HomeScreen: React.FC = () => {
               <LabelValueBlock
                 label={"1st Marriage / Divorcee"}
                 value={
-                  selectedMale?.is_divorced
+                  maleProfiles[selectedMaleIndex]?.is_divorced
                     ? "Divorcee"
-                    : selectedMale?.is_first_marriage
+                    : maleProfiles[selectedMaleIndex]?.is_first_marriage
                     ? "1st Marriage"
                     : "Married Before"
                 }
@@ -512,9 +502,9 @@ const HomeScreen: React.FC = () => {
               <LabelValueBlock
                 label={"1st Marriage / Divorcee"}
                 value={
-                  selectedFemale?.is_divorced
+                  femaleProfiles[selectedFemaleIndex]?.is_divorced
                     ? "Divorcee"
-                    : selectedFemale?.is_first_marriage
+                    : femaleProfiles[selectedFemaleIndex]?.is_first_marriage
                     ? "1st Marriage"
                     : "Married Before"
                 }
@@ -528,12 +518,12 @@ const HomeScreen: React.FC = () => {
           </div>
 
           {/* OTHER DETAILS */}
-          <div className="interactive-card">
+          <div className={`interactive-card`}>
             {/* Boy */}
             <div className="label-value-container-left">
               <LabelValueBlock
                 label={"Any other details / Conditions"}
-                value={selectedMale?.any_other_details}
+                value={maleProfiles[selectedMaleIndex]?.any_other_details}
               />
             </div>
 
@@ -541,13 +531,19 @@ const HomeScreen: React.FC = () => {
             <div className="label-value-container-right">
               <LabelValueBlock
                 label={"Any other details / Conditions"}
-                value={selectedFemale?.any_other_details}
+                value={femaleProfiles[selectedFemaleIndex]?.any_other_details}
                 align="right"
               />
             </div>
           </div>
 
-          <div className="interactive-card">
+          <div
+            className={`interactive-card ${checkMatch(
+              "mother_bari",
+              maleProfiles[selectedMaleIndex]?.mother_bari,
+              femaleProfiles[selectedFemaleIndex]?.mother_bari
+            )}`}
+          >
             {/* Boy */}
             <div className="label-value-container-left">
               <LabelValueBlock label={"Any other details / Conditions"}>
@@ -555,13 +551,13 @@ const HomeScreen: React.FC = () => {
                   <span className="text-lg font-normal text-n-600">
                     Father:{" "}
                     <span className="font-medium text-n-900">
-                      {selectedMale?.father_bari}
+                      {maleProfiles[selectedMaleIndex]?.father_bari}
                     </span>
                   </span>
                   <span className="text-lg font-normal text-n-600">
                     Mother:{" "}
                     <span className="font-medium text-n-900">
-                      {selectedMale?.mother_bari}
+                      {maleProfiles[selectedMaleIndex]?.mother_bari}
                     </span>
                   </span>
                 </div>
@@ -577,14 +573,14 @@ const HomeScreen: React.FC = () => {
                 <div className="flex gap-2.5 justify-center items-center">
                   <span className="text-lg font-normal text-n-600">
                     Father:{" "}
-                    <span className="font-medium text-n-900">
-                      {selectedFemale?.father_bari}
+                    <span className="text-lg font-normal text-n-600">
+                      {femaleProfiles[selectedFemaleIndex]?.father_bari}
                     </span>
                   </span>
                   <span className="text-lg font-normal text-n-600">
                     Mother:{" "}
                     <span className="font-medium text-n-900">
-                      {selectedFemale?.mother_bari}
+                      {femaleProfiles[selectedFemaleIndex]?.mother_bari}
                     </span>
                   </span>
                 </div>
@@ -606,7 +602,8 @@ const HomeScreen: React.FC = () => {
           <Button
             className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
             onClick={() => {
-              selectedMale && initSendMessage(selectedMale);
+              maleProfiles[selectedMaleIndex] &&
+                initSendMessage(maleProfiles[selectedMaleIndex]);
             }}
           >
             <Image src={ShareIcon} alt="share" />
@@ -636,12 +633,15 @@ const HomeScreen: React.FC = () => {
             </span>
 
             {/* Boy - Father Name */}
-            <LabelValueBlock label="Name" value={selectedMale?.father_name} />
+            <LabelValueBlock
+              label="Name"
+              value={maleProfiles[selectedMaleIndex]?.father_name}
+            />
 
             {/* Boy - Father Employee Details */}
             <LabelValueBlock
               label="Employee Details"
-              value={selectedMale?.father_emp_details}
+              value={maleProfiles[selectedMaleIndex]?.father_emp_details}
             />
           </div>
 
@@ -654,12 +654,15 @@ const HomeScreen: React.FC = () => {
               Mother’s Details
             </span>
             {/* Boy - Mother Name */}
-            <LabelValueBlock label="Name" value={selectedMale?.mother_name} />
+            <LabelValueBlock
+              label="Name"
+              value={maleProfiles[selectedMaleIndex]?.mother_name}
+            />
 
             {/* Boy - Mother Employee Details */}
             <LabelValueBlock
               label="Employee Details"
-              value={selectedMale?.mother_emp_details}
+              value={maleProfiles[selectedMaleIndex]?.mother_emp_details}
             />
           </div>
         </div>
@@ -673,12 +676,15 @@ const HomeScreen: React.FC = () => {
             </span>
 
             {/* GIrl - Father Name */}
-            <LabelValueBlock label="Name" value={selectedFemale?.father_name} />
+            <LabelValueBlock
+              label="Name"
+              value={femaleProfiles[selectedFemaleIndex]?.father_name}
+            />
 
             {/* GIrl - Father Employee Details */}
             <LabelValueBlock
               label="Employee Details"
-              value={selectedFemale?.father_emp_details}
+              value={femaleProfiles[selectedFemaleIndex]?.father_emp_details}
             />
           </div>
 
@@ -691,12 +697,15 @@ const HomeScreen: React.FC = () => {
               Mother’s Details
             </span>
             {/* GIrl - Mother Name */}
-            <LabelValueBlock label="Name" value={selectedFemale?.mother_name} />
+            <LabelValueBlock
+              label="Name"
+              value={femaleProfiles[selectedFemaleIndex]?.mother_name}
+            />
 
             {/* GIrl - Mother Employee Details */}
             <LabelValueBlock
               label="Employee Details"
-              value={selectedFemale?.mother_emp_details}
+              value={femaleProfiles[selectedFemaleIndex]?.mother_emp_details}
             />
           </div>
         </div>
@@ -722,15 +731,18 @@ const HomeScreen: React.FC = () => {
           <div className="flex gap-7 justify-start items-center">
             {/* ADDRESS */}
             <div className="flex flex-col gap-1 justify-start items-start">
-              <LabelValueBlock label="Address" value={selectedMale?.address} />
+              <LabelValueBlock
+                label="Address"
+                value={maleProfiles[selectedMaleIndex]?.address}
+              />
             </div>
 
             {/* EMAIL */}
             <div className="flex flex-col gap-1 justify-start items-start">
               <LabelValueBlock label="Email">
-                <Link href={`${selectedMale?.email}`}>
+                <Link href={`${maleProfiles[selectedMaleIndex]?.email}`}>
                   <span className="text-lg font-medium text-n-900">
-                    {selectedMale?.email}
+                    {maleProfiles[selectedMaleIndex]?.email}
                   </span>
                 </Link>
               </LabelValueBlock>
@@ -739,15 +751,15 @@ const HomeScreen: React.FC = () => {
             {/* MOBILE */}
             <div className="flex flex-col gap-1 justify-start items-start">
               <LabelValueBlock label="Mobile">
-                <Link href={`tel:${selectedMale?.mob1}`}>
+                <Link href={`tel:${maleProfiles[selectedMaleIndex]?.mob1}`}>
                   <span className="text-lg font-medium text-n-900">
-                    {selectedMale?.mob1}
+                    {maleProfiles[selectedMaleIndex]?.mob1}
                   </span>
                 </Link>
                 <span>/</span>
-                <Link href={`tel:${selectedMale?.mob2}`}>
+                <Link href={`tel:${maleProfiles[selectedMaleIndex]?.mob2}`}>
                   <span className="text-lg font-medium text-n-900">
-                    {selectedMale?.mob2}
+                    {maleProfiles[selectedMaleIndex]?.mob2}
                   </span>
                 </Link>
               </LabelValueBlock>
@@ -765,16 +777,18 @@ const HomeScreen: React.FC = () => {
             <div className="flex flex-col gap-1 justify-start items-start">
               <LabelValueBlock
                 label="Address"
-                value={selectedFemale?.address}
+                value={femaleProfiles[selectedFemaleIndex]?.address}
               />
             </div>
 
             {/* EMAIL */}
             <div className="flex flex-col gap-1 justify-start items-start">
               <LabelValueBlock label="Email">
-                <Link href={`${selectedFemale?.email}`}>
+                <Link href={`${femaleProfiles[selectedFemaleIndex]?.email}`}>
                   <span className="text-lg font-medium text-n-900">
-                    {selectedFemale?.email ? selectedFemale.email : "-"}
+                    {femaleProfiles[selectedFemaleIndex]?.email
+                      ? femaleProfiles[selectedFemaleIndex]?.email
+                      : "-"}
                   </span>
                 </Link>
               </LabelValueBlock>
@@ -783,15 +797,15 @@ const HomeScreen: React.FC = () => {
             {/* MOBILE */}
             <div className="flex flex-col gap-1 justify-start items-start">
               <LabelValueBlock label="Mobile">
-                <Link href={`tel:selectedFemale?.mob1`}>
+                <Link href={`tel:${femaleProfiles[selectedFemaleIndex]?.mob1}`}>
                   <span className="text-lg font-medium text-n-900">
-                    {selectedFemale?.mob1}
+                    {femaleProfiles[selectedFemaleIndex]?.mob1}
                   </span>
                 </Link>
                 <span>/</span>
-                <Link href={`tel:selectedFemale?.mob2`}>
+                <Link href={`tel:${femaleProfiles[selectedFemaleIndex]?.mob2}`}>
                   <span className="text-lg font-medium text-n-900">
-                    {selectedFemale?.mob2}
+                    {femaleProfiles[selectedFemaleIndex]?.mob2}
                   </span>
                 </Link>
               </LabelValueBlock>

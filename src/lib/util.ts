@@ -84,6 +84,5 @@ export function extractDriveFileId(url: string): string | null {
 
 export function toDriveDirectView(url: string): string {
   const id = extractDriveFileId(url);
-  console.log(id, "id");
   return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
 }

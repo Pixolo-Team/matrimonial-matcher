@@ -24,6 +24,7 @@ export function calculateCompatibilityRating(
   boy: Profile,
   girl: Profile
 ): number {
+  if (!boy && !girl) return 0;
   // Initialize score
   let score = 0;
 
@@ -79,4 +80,26 @@ export function calculateCompatibilityRating(
 function parseHeight(height: string): Numeric {
   const cm = parseFloat(height);
   return isNaN(cm) ? null : cm;
+}
+
+export function checkMatch(
+  field: string,
+  maleValue: number | string,
+  femaleValue: number | string
+): "yes-match" | "no-match" {
+  if (!maleValue || !femaleValue) return "no-match"; // Missing data is a fail
+
+  switch (field) {
+    case "height":
+    case "salary_pm":
+    case "age":
+      return maleValue >= femaleValue ? "yes-match" : "no-match";
+
+    case "father_bari":
+    case "mother_bari": // Example: must be different
+      return maleValue !== femaleValue ? "yes-match" : "no-match";
+
+    default:
+      return maleValue === femaleValue ? "yes-match" : "no-match";
+  }
 }
