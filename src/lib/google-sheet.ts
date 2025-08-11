@@ -51,7 +51,7 @@ function parseSheetRows(json: any): SheetRow[] {
     row.c.reduce((acc: SheetRow, cell: any, i: number) => {
       const colLetter = colLetters[i];
       const key = columnMap[colLetter];
-      const value = cell?.v ?? "-";
+      const value = cell?.v ?? "";
 
       // Special handling for DOB
       if (key === "date_of_birth") {

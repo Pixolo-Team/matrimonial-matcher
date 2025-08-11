@@ -209,7 +209,10 @@ export function buildPartialWhatsAppMessage(
  * - keep digits only
  * - add default country code if missing (e.g., "91" for India)
  */
-export function normalizePhone(raw?: string, defaultCountryCode = "91"): string | null {
+export function normalizePhone(
+  raw?: string,
+  defaultCountryCode = "91"
+): string | null {
   if (!raw) return null;
   const digits = raw.replace(/\D/g, ""); // strip non-digits
   if (!digits) return null;
@@ -230,10 +233,10 @@ export function normalizePhone(raw?: string, defaultCountryCode = "91"): string 
  */
 export function buildWebWhatsAppLink(message: string, phone?: string) {
   const encoded = encodeURIComponent(message);
-  const normalized = normalizePhone(phone || "");
+  // const normalized = normalizePhone("918369377673" || "");
 
-  if (normalized) {
-    return `https://web.whatsapp.com/send?phone=${normalized}&text=${encoded}`;
+  if (true) {
+    return `https://web.whatsapp.com/send?phone=918369377673&text=${encoded}`;
   }
   return `https://web.whatsapp.com/send?text=${encoded}`;
 }
