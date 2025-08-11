@@ -23,4 +23,5 @@ const SliderArrow: React.FC<{
     </div>
   );
 };
+
 export default SliderArrow;

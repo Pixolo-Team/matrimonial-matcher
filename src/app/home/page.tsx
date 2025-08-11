@@ -29,6 +29,8 @@ import {
 } from "@/lib/whatsapp";
 
 // IMAGES //
+import GirlProfileImage from "@/../public/assets/images/omkar-crush.jpg";
+import BoyProfileImage from "@/../public/assets/images/main-profile.png";
 import UserThumbImage from "@/../public/assets/images/user-photo.png";
 import ProfileImage from "@/../public/assets/images/main-profile.png";
 
@@ -66,6 +68,50 @@ const HomeScreen: React.FC = () => {
   const initSendMessage = (user: Profile) => {
     setSelectedUser(user);
     setSendMessageVisible(true);
+  };
+
+  // close popup
+  const closeSendPopup = () => {
+    setSendMessageVisible(false);
+    // setSelectedUser(null); // optional
+  };
+
+  // helpers to open WhatsApp
+  const openWhatsApp = (msg: string, to?: string) => {
+    const url = buildWebWhatsAppLink(msg, to); // uses normalizePhone internally
+    // open in new tab; on mobile, browser redirects to app
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  // send basic
+  const handleSendBasic = () => {
+    if (!selectedUser) return;
+    const msg = buildPartialWhatsAppMessage(selectedUser, {
+      include: [
+        "code_no",
+        "name",
+        "gender",
+        "date_of_birth",
+        "age",
+        "height",
+        "working_or_own_venture",
+        "designation",
+        "employer",
+        "working_location",
+        "mob1",
+      ],
+      title: "Candidate Snapshot",
+    });
+    openWhatsApp(msg, selectedUser.mob1); // or use a fixed `sendTo`
+    closeSendPopup();
+  };
+
+  // send full
+  const handleSendFull = () => {
+    if (!selectedUser) return;
+    const msg = buildFullWhatsAppMessage(selectedUser);
+    openWhatsApp(msg, selectedUser.mob1); // or a fixed `sendTo`
+    closeSendPopup();
   };
 
   /**
@@ -135,8 +181,22 @@ const HomeScreen: React.FC = () => {
     }
   }, []);
 
+  // TODO: Remove later
+  const BoysImgs = [
+    "/assets/images/main-profile.png",
+    "/assets/images/omkar-2.png",
+    "/assets/images/omkar-2.png",
+    "/assets/images/omkar-2.png",
+  ];
+  // TODO: Remove later
+  const GirlsImgs = [
+    "/assets/images/omkar-crush.jpg",
+    "/assets/images/omkar-crush-2.jpg",
+  ];
+
   useEffect(() => {
     loadAndProcessData();
+    console.log(selectedUser, "male");
   }, [loadAndProcessData]);
 
   return (
@@ -144,9 +204,11 @@ const HomeScreen: React.FC = () => {
       {/* Popup that comes on Send Message */}
       <SendMessagePopup
         isVisible={sendMessageVisible}
-        onClose={() => setSendMessageVisible(false)}
+        onClose={closeSendPopup}
         sendTo={"2342"}
         user={selectedUser}
+        sendBasicDetails={handleSendBasic}
+        sendFullDetails={handleSendFull}
       />
 
       {/* Header Section  */}
@@ -265,8 +327,9 @@ const HomeScreen: React.FC = () => {
       {/* Main Content Section */}
       <div className="flex">
         {/* Boys Profile Image Wrapper */}
-        <div className=" w-116 flex flex-col items-center gap-4 px-5 py-8 ">
-          <PhotoSlider />
+        <div className="w-116 flex flex-col items-center gap-4 px-5 py-8 ">
+          {/* Profile Image Slider */}
+          <PhotoSlider images={BoysImgs} alt="Profile photo" loop={false} />
           {/* Button */}
           <Button
             className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
@@ -599,9 +662,8 @@ const HomeScreen: React.FC = () => {
 
         {/* GIRLS PHOTO SIDE */}
         <div className="w-116 flex flex-col items-center gap-4 px-5 py-8">
-          <div className="rounded-3xl w-full">
-            <Image src={ProfileImage} alt="omkar" className="w-full" />
-          </div>
+          <PhotoSlider images={GirlsImgs} alt="Profile photo" loop />
+
           {/* Button */}
           <Button
             className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
