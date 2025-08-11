@@ -256,6 +256,9 @@
   .yes-match-reason {
     @apply hidden;
   }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }      /* Chrome/Safari */
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
 

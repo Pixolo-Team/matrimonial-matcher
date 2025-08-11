@@ -1,11 +1,16 @@
 "use client"
+// REACT //
 import React, { useEffect, useRef } from "react";
 
+// COMPONENTS //
 import { Button } from "@/components/ui/button";
-import { ShareIcon } from "lucide-react";
 import Image from "next/image";
+
+// OTHERS //
 import { buildFullWhatsAppMessage, buildPartialWhatsAppMessage, buildWebWhatsAppLink } from "@/lib/whatsapp";
 
+// SVG's //
+import ShareIcon from "@/../public/icons/share.svg";
 
 type SendMessagePopupProps = {
   isVisible: boolean;
@@ -63,7 +68,7 @@ export default function SendMessagePopup({ isVisible, onClose, sendTo, user }: S
       onClick={handleOverlayClick}
       className="fixed inset-0 z-50 bg-slate-800 bg-opacity-30 flex justify-center items-center"
     >
-      <div className="bg-white px-10 py-6 rounded-xl w-[90%] max-w-sm animate-fadeIn shadow-lg">
+      <div className="bg-white px-10 py-6 rounded-xl w-2/6 animate-fadeIn shadow-lg">
         <div className="flex flex-col items-center gap-11">
           {/* Centered Text */}
           <p className="text-center text-lg font-medium text-gray-900">You are about to send the details to the boy’s family. Please the select the option below to decide what data to send.</p>
@@ -71,7 +76,7 @@ export default function SendMessagePopup({ isVisible, onClose, sendTo, user }: S
           {/* Button Stack */}
           <div className="flex flex-col gap-5 w-full">
             {/* Send Basic Details */}
-            <Button className="bg-slate-50 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer" onClick={sendWhatsappMessage}>
+            <Button className="bg-slate-50 border-2 border-yellow-500 hover:bg-yellow-200 text-slate-800 w-full h-18 text-base font-medium cursor-pointer" onClick={sendWhatsappMessage} variant={"outline"}>
                 <Image src={ShareIcon} alt="share" />
                 Send Basic Details
             </Button>

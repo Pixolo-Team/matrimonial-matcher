@@ -1,15 +1,18 @@
-"use client"
+"use client";
 // REACT //
 import React, { useState, useEffect, useCallback } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 
 // COMPONENTS //
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-// IMAGES //
-import UserThumbImage from "@/../public/assets/images/user-photo.png";
-import ProfileImage from "@/../public/assets/images/main-profile.png";
+import LabelValueBlock from "../components/LabelValueBlock";
+import SendMessagePopup from "../components/SendMessagePopup";
+import PhotoSlider from "../components/PhotoSlider";
+import HeaderUserChip from "../components/HeaderUserChip";
+import MatchBadge from "../components/MatchBadge";
+import SliderArrow from "../components/SliderArrow";
 
 // CONSTANTS //
 import { SHEET_URL } from "@/constants";
@@ -25,15 +28,15 @@ import {
   buildWebWhatsAppLink,
 } from "@/lib/whatsapp";
 
+// IMAGES //
+import UserThumbImage from "@/../public/assets/images/user-photo.png";
+import ProfileImage from "@/../public/assets/images/main-profile.png";
+
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
-import LabelValueBlock from "../components/LabelValueBlock";
-import SendMessagePopup from "../components/SendMessagePopup";
-import PhotoSlider from "../components/PhotoSlider";
 
 /** Home Screen */
 const HomeScreen: React.FC = () => {
-
   // Define States
   const [sendMessageVisible, setSendMessageVisible] = useState<boolean>(false);
   const [maleProfiles, setMaleProfiles] = useState<Profile[]>([]);
@@ -45,17 +48,25 @@ const HomeScreen: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
 
   // Helper Functions
+  const [boysRef, boysApi] = useEmblaCarousel({
+    dragFree: true,
+    containScroll: "trimSnaps",
+  });
+  const [girlsRef, girlsApi] = useEmblaCarousel({
+    dragFree: true,
+    containScroll: "trimSnaps",
+  });
 
   /** Toggle the Popup */
   const toggleSendPopup = () => {
-    setSendMessageVisible(prev => !prev);
-  }
+    setSendMessageVisible((prev) => !prev);
+  };
 
   /** Open Send Message Popup */
   const initSendMessage = (user: Profile) => {
     setSelectedUser(user);
     setSendMessageVisible(true);
-  }
+  };
 
   /**
    * Separates a list of profiles into male and female groups based on the gender field.
@@ -80,114 +91,165 @@ const HomeScreen: React.FC = () => {
   }
 
   /** Process the raw data ans store it in profile states */
-    const loadAndProcessData = useCallback(async () => {
-      try {
-        const rawProfiles = await fetchSheetData(SHEET_URL);
-  
-        const { males, females } = separateProfilesByGender(rawProfiles);
-  
-        setMaleProfiles(males);
-        setFemaleProfiles(females);
+  const loadAndProcessData = useCallback(async () => {
+    try {
+      const rawProfiles = await fetchSheetData(SHEET_URL);
 
-        // Set the first Male
-        males.length > 0 ? setSelectedMale(males[0]) : null;
+      const { males, females } = separateProfilesByGender(rawProfiles);
 
-        // Set first Female
-        females.length > 0 ? setSelectedFemale(females[0]) : null;
-  
-        // Example compatibility test (can be removed or moved to button action)
-        const rating = calculateCompatibilityRating(
-          {
-            name: "Rahul",
-            age: "30",
-            salary_pm: "90000",
-            mother_bari: "Bharadwaj",
-            working_location: "Mumbai",
-            is_divorced: "No",
-            height: "178",
-          },
-          {
-            name: "Priya",
-            age: "37",
-            salary_pm: "50000",
-            mother_bari: "Bharadwaj",
-            working_location: "Mumbai",
-            is_divorced: "No",
-            height: "185",
-          }
-        );
-        console.log(`Compatibility Rating: ${rating}%`);
-      } catch (error) {
-        console.error("Error loading data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }, []);
+      setMaleProfiles(males);
+      setFemaleProfiles(females);
 
+      // Set the first Male
+      males.length > 0 ? setSelectedMale(males[0]) : null;
 
+      // Set first Female
+      females.length > 0 ? setSelectedFemale(females[0]) : null;
+
+      // Example compatibility test (can be removed or moved to button action)
+      const rating = calculateCompatibilityRating(
+        {
+          name: "Rahul",
+          age: "30",
+          salary_pm: "90000",
+          mother_bari: "Bharadwaj",
+          working_location: "Mumbai",
+          is_divorced: "No",
+          height: "178",
+        },
+        {
+          name: "Priya",
+          age: "37",
+          salary_pm: "50000",
+          mother_bari: "Bharadwaj",
+          working_location: "Mumbai",
+          is_divorced: "No",
+          height: "185",
+        }
+      );
+      console.log(`Compatibility Rating: ${rating}%`);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-      loadAndProcessData();
-    }, [loadAndProcessData]);
-  
+    loadAndProcessData();
+  }, [loadAndProcessData]);
+
   return (
     <div className="bg-slate-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-slate-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-slate-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
-      
       {/* Popup that comes on Send Message */}
-      <SendMessagePopup isVisible={sendMessageVisible} onClose={()=>setSendMessageVisible(false)} sendTo={"2342"} user={selectedUser} />
-      
+      <SendMessagePopup
+        isVisible={sendMessageVisible}
+        onClose={() => setSendMessageVisible(false)}
+        sendTo={"2342"}
+        user={selectedUser}
+      />
+
       {/* Header Section  */}
       <div className=" flex gap-3.5 justify-between">
         {/* Boys Header */}
-        <div className=" flex w-1/2 py-2 px-9 gap-3.5">
-          {/* User thumb */}
-          <div className="bg-yellow-500 rounded-2xl hover:bg-slate-100 flex gap-2 px-3 py-2.5 justify-start items-center">
-            {/* User Image */}
-            <Image src={UserThumbImage} alt="omkar" className="" />
-            {/* User Info */}
-            <div className="flex flex-col justify-center items-start">
-              <span className="text-lg font-semibold text-n-900">
-                Rahul Shetty
-              </span>
-              <span className="text-sm font-normal text-n-700">33 Years</span>
+        <div className="relative flex w-1/2 py-2 px-9 overflow-hidden">
+          {/* Slider Arrow Component - Right*/}
+          <div
+            className="absolute top-1/2 left-3 -translate-y-1/2 z-10"
+            onClick={() => boysApi?.scrollPrev()}
+          >
+            <SliderArrow direction="left" />
+          </div>
+          <div className="overflow-hidden w-full" ref={boysRef}>
+            <div className="flex gap-3.5">
+              {/* Boy Header Chip Component */}
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+                isActive
+              />
+              {/* Boy Header Chip Component */}
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+              />
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+              />
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+              />
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+              />
             </div>
           </div>
-          <div className=" rounded-2xl hover:bg-slate-100 flex gap-2 px-3 py-2.5 justify-start items-center">
-            {/* User Image */}
-            <Image src={UserThumbImage} alt="omkar" className="" />
-            {/* User Info */}
-            <div className="flex flex-col justify-center items-start">
-              <span className="text-lg font-semibold text-n-900">
-                Rahul Shetty
-              </span>
-              <span className="text-sm font-normal text-n-700">33 Years</span>
-            </div>
+          {/* Slider Arrow Component - Right */}
+          <div
+            className="absolute top-1/2 right-3 -translate-y-1/2 z-10"
+            onClick={() => boysApi?.scrollNext()}
+          >
+            <SliderArrow direction="right" />
           </div>
         </div>
         {/* Girls Header */}
-        <div className=" flex w-1/2 py-2 px-9 gap-3.5">
-          {/* User thumb */}
-          <div className="bg-yellow-500 rounded-2xl hover:bg-slate-100 flex gap-2 px-3 py-2.5 justify-start items-center">
-            {/* User Image */}
-            <Image src={UserThumbImage} alt="omkar" className="" />
-            {/* User Info */}
-            <div className="flex flex-col justify-center items-start">
-              <span className="text-lg font-semibold text-n-900">
-                Rahul Shetty
-              </span>
-              <span className="text-sm font-normal text-n-700">33 Years</span>
+        <div className="relative flex w-1/2 py-2 px-9">
+          {/* Slider Arrow Component - Left */}
+          <div
+            className="absolute top-1/2 left-3 -translate-y-1/2 z-10"
+            onClick={() => girlsApi?.scrollPrev()}
+          >
+            <SliderArrow direction="left" />
+          </div>
+          <div className="overflow-hidden w-full" ref={girlsRef}>
+            <div className="flex gap-3.5 ">
+              {/* Girl Header Chip Component */}
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+                isActive
+              />
+              {/* Girl Header Chip Component */}
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+              />
+              {/* Girl Header Chip Component */}
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+              />
+              {/* Girl Header Chip Component */}
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+              />
+              {/* Girl Header Chip Component */}
+              <HeaderUserChip
+                img={UserThumbImage}
+                name="Rahul Shetty"
+                age="33"
+              />
             </div>
           </div>
-          <div className=" rounded-2xl hover:bg-slate-100 flex gap-2 px-3 py-2.5 justify-start items-center">
-            {/* User Image */}
-            <Image src={UserThumbImage} alt="omkar" className="" />
-            {/* User Info */}
-            <div className="flex flex-col justify-center items-start">
-              <span className="text-lg font-semibold text-n-900">
-                Rahul Shetty
-              </span>
-              <span className="text-sm font-normal text-n-700">33 Years</span>
-            </div>
+          {/* Slider Arrow Component - Right */}
+          <div
+            className="absolute top-1/2 right-3 -translate-y-1/2"
+            onClick={() => girlsApi?.scrollNext()}
+          >
+            <SliderArrow direction="right" />
           </div>
         </div>
       </div>
@@ -206,7 +268,12 @@ const HomeScreen: React.FC = () => {
         <div className=" w-116 flex flex-col items-center gap-4 px-5 py-8 ">
           <PhotoSlider />
           {/* Button */}
-          <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer" onClick={()=>{ selectedFemale && initSendMessage(selectedFemale)}}>
+          <Button
+            className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
+            onClick={() => {
+              selectedFemale && initSendMessage(selectedFemale);
+            }}
+          >
             <Image src={ShareIcon} alt="share" />
             Send Girls Details
           </Button>
@@ -228,78 +295,75 @@ const HomeScreen: React.FC = () => {
               </span>
             </div>
 
-
-            {/* MATCH SCORE */}
-            <div
-              className="w-24 h-24 absolute  left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-0 p-5 
-    before:content-[''] before:w-full before:h-full 
-    before:bg-[var(--color-yellow-500)] before:rounded-3xl 
-    before:rotate-45 before:absolute before:top-0 before:left-0"
-            >
-              <p className="font-bold text-sm text-slate-900 z-20">Match</p>
-              <p className="font-bold text-4xl text-slate-900 z-20">66</p>
-            </div>
+            {/* Match Score Badge Component */}
+            <MatchBadge score={69} />
           </div>
-          
+
           {/* DOB */}
           <div className=" interactive-card ">
             {/* Boy - DOB */}
             <div className="label-value-container-left">
-            <LabelValueBlock label="Date of Birth">
-              <div className="flex flex-col  justify-start items-start">
-                <div className="flex gap-2 justify-center items-center">
-                  <span className="text-lg font-medium text-n-900">
-                    {selectedMale?.date_of_birth}
-                  </span>
-                  <span className="text-xl font-medium text-n-600">({selectedMale?.age})</span>
+              <LabelValueBlock label="Date of Birth">
+                <div className="flex flex-col  justify-start items-start">
+                  <div className="flex gap-2 justify-center items-center">
+                    <span className="text-lg font-medium text-n-900">
+                      {selectedMale?.date_of_birth}
+                    </span>
+                    <span className="text-xl font-medium text-n-600">
+                      ({selectedMale?.age})
+                    </span>
+                  </div>
+                  <div className="flex gap-2.5 justify-start items-center">
+                    <span className="text-sm font-normal text-n-900">
+                      {selectedMale?.birth_day}
+                    </span>
+                    <div className="flex justify-start items-start"></div>
+                    <span className="text-sm font-normal text-n-900">
+                      {selectedMale?.birth_time}
+                    </span>
+                    <div className="flex justify-start items-start"></div>
+                    <span className="text-sm font-normal text-n-900">
+                      {selectedMale?.birth_place}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex gap-2.5 justify-start items-center">
-                  <span className="text-sm font-normal text-n-900">{selectedMale?.birth_day}</span>
-                  <div className="flex justify-start items-start"></div>
-                  <span className="text-sm font-normal text-n-900">
-                    {selectedMale?.birth_time}
-                  </span>
-                  <div className="flex justify-start items-start"></div>
-                  <span className="text-sm font-normal text-n-900">
-                    {selectedMale?.birth_place}
-                  </span>
-                </div>
-              </div>
-            </LabelValueBlock>
+              </LabelValueBlock>
             </div>
 
             {/* Girl - DOB */}
             <div className="label-value-container-right">
               <LabelValueBlock label="Date of Birth" align="right">
-              <div className="flex flex-col  justify-start items-end">
-                <div className="flex gap-2 justify-center items-center">
-                  <span className="text-lg font-medium text-n-900">
-                    {selectedFemale?.date_of_birth}
-                  </span>
-                  <span className="text-xl font-medium text-n-600">({selectedFemale?.age})</span>
+                <div className="flex flex-col  justify-start items-end">
+                  <div className="flex gap-2 justify-center items-center">
+                    <span className="text-lg font-medium text-n-900">
+                      {selectedFemale?.date_of_birth}
+                    </span>
+                    <span className="text-xl font-medium text-n-600">
+                      ({selectedFemale?.age})
+                    </span>
+                  </div>
+                  <div className="flex gap-2.5 justify-start items-center">
+                    <span className="text-sm font-normal text-n-900">
+                      {selectedFemale?.birth_day}
+                    </span>
+                    <div className="flex justify-start items-start"></div>
+                    <span className="text-sm font-normal text-n-900">
+                      {selectedFemale?.birth_time}
+                    </span>
+                    <div className="flex justify-start items-start"></div>
+                    <span className="text-sm font-normal text-n-900">
+                      {selectedFemale?.birth_place}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex gap-2.5 justify-start items-center">
-                  <span className="text-sm font-normal text-n-900">{selectedFemale?.birth_day}</span>
-                  <div className="flex justify-start items-start"></div>
-                  <span className="text-sm font-normal text-n-900">
-                    {selectedFemale?.birth_time}
-                  </span>
-                  <div className="flex justify-start items-start"></div>
-                  <span className="text-sm font-normal text-n-900">
-                    {selectedFemale?.birth_place}
-                  </span>
-                </div>
-              </div>
-            </LabelValueBlock>
+              </LabelValueBlock>
             </div>
             <span className="no-match-reason">Less than</span>
             <span className="yes-match-reason">More than</span>
           </div>
 
-
           {/* HEIGHT */}
           <div className="interactive-card yes-match">
-            
             {/* Boy Height */}
             <div className="label-value-container-left">
               <LabelValueBlock label={"Height"} value={selectedMale?.height} />
@@ -307,7 +371,11 @@ const HomeScreen: React.FC = () => {
 
             {/* Girl Height */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"Height"} value={selectedFemale?.height} align="right"  />
+              <LabelValueBlock
+                label={"Height"}
+                value={selectedFemale?.height}
+                align="right"
+              />
             </div>
 
             {/* Reasons for Yes / No */}
@@ -317,15 +385,21 @@ const HomeScreen: React.FC = () => {
 
           {/* NAKSHATRA / RASHI */}
           <div className="interactive-card">
-
             {/* Boy */}
             <div className="label-value-container-left">
-              <LabelValueBlock label={"Nakshatra | Rashi"} value={`${selectedMale?.nakshatra} | ${selectedMale?.rashi}`} />
+              <LabelValueBlock
+                label={"Nakshatra | Rashi"}
+                value={`${selectedMale?.nakshatra} | ${selectedMale?.rashi}`}
+              />
             </div>
 
             {/* Girl */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"Nakshatra | Rashi"} value={`${selectedFemale?.nakshatra} | ${selectedFemale?.rashi}`} align="right" />
+              <LabelValueBlock
+                label={"Nakshatra | Rashi"}
+                value={`${selectedFemale?.nakshatra} | ${selectedFemale?.rashi}`}
+                align="right"
+              />
             </div>
           </div>
 
@@ -333,12 +407,19 @@ const HomeScreen: React.FC = () => {
           <div className="interactive-card">
             {/* Boy */}
             <div className="label-value-container-left">
-              <LabelValueBlock label={"Education"} value={selectedMale?.edu_qualifications} />
+              <LabelValueBlock
+                label={"Education"}
+                value={selectedMale?.edu_qualifications}
+              />
             </div>
 
             {/* Girl */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"Education"} value={selectedFemale?.edu_qualifications} align="right" />
+              <LabelValueBlock
+                label={"Education"}
+                value={selectedFemale?.edu_qualifications}
+                align="right"
+              />
             </div>
           </div>
 
@@ -346,12 +427,19 @@ const HomeScreen: React.FC = () => {
           <div className="interactive-card">
             {/* Boy */}
             <div className="label-value-container-left">
-              <LabelValueBlock label={"Working / Own Venture"} value={selectedMale?.working_or_own_venture} />
+              <LabelValueBlock
+                label={"Working / Own Venture"}
+                value={selectedMale?.working_or_own_venture}
+              />
             </div>
 
             {/* Girl */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"Working / Own Venture"} value={selectedFemale?.working_or_own_venture} align="right" />
+              <LabelValueBlock
+                label={"Working / Own Venture"}
+                value={selectedFemale?.working_or_own_venture}
+                align="right"
+              />
             </div>
           </div>
 
@@ -359,15 +447,22 @@ const HomeScreen: React.FC = () => {
           <div className="interactive-card">
             {/* Boy */}
             <div className="label-value-container-left">
-              <LabelValueBlock label={"Working Location"} value={selectedMale?.working_location} />
+              <LabelValueBlock
+                label={"Working Location"}
+                value={selectedMale?.working_location}
+              />
             </div>
 
             {/* Girl */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"Working Location"} value={selectedFemale?.working_location} align="right" />
+              <LabelValueBlock
+                label={"Working Location"}
+                value={selectedFemale?.working_location}
+                align="right"
+              />
             </div>
 
-          {/* Match Reasons */}
+            {/* Match Reasons */}
             <span className="no-match-reason">Less than</span>
             <span className="yes-match-reason">More than</span>
           </div>
@@ -376,12 +471,19 @@ const HomeScreen: React.FC = () => {
           <div className="interactive-card">
             {/* Boy */}
             <div className="label-value-container-left">
-              <LabelValueBlock label={"Salary PM"} value={selectedMale?.salary_pm} />
+              <LabelValueBlock
+                label={"Salary PM"}
+                value={selectedMale?.salary_pm}
+              />
             </div>
 
             {/* Girl */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"Salary PM"} value={selectedFemale?.salary_pm} align="right" />
+              <LabelValueBlock
+                label={"Salary PM"}
+                value={selectedFemale?.salary_pm}
+                align="right"
+              />
             </div>
 
             {/* Match Reasons */}
@@ -393,12 +495,31 @@ const HomeScreen: React.FC = () => {
           <div className="interactive-card">
             {/* Boy */}
             <div className="label-value-container-left">
-              <LabelValueBlock label={"1st Marriage / Divorcee"} value={selectedMale?.is_divorced ? "Divorcee" : (selectedMale?.is_first_marriage ? "1st Marriage" : "Married Before")} />
+              <LabelValueBlock
+                label={"1st Marriage / Divorcee"}
+                value={
+                  selectedMale?.is_divorced
+                    ? "Divorcee"
+                    : selectedMale?.is_first_marriage
+                    ? "1st Marriage"
+                    : "Married Before"
+                }
+              />
             </div>
 
             {/* Girl */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"1st Marriage / Divorcee"} value={selectedFemale?.is_divorced ? "Divorcee" : (selectedFemale?.is_first_marriage ? "1st Marriage" : "Married Before")}  align="right" />
+              <LabelValueBlock
+                label={"1st Marriage / Divorcee"}
+                value={
+                  selectedFemale?.is_divorced
+                    ? "Divorcee"
+                    : selectedFemale?.is_first_marriage
+                    ? "1st Marriage"
+                    : "Married Before"
+                }
+                align="right"
+              />
             </div>
 
             {/* Match Reasons */}
@@ -410,34 +531,62 @@ const HomeScreen: React.FC = () => {
           <div className="interactive-card">
             {/* Boy */}
             <div className="label-value-container-left">
-              <LabelValueBlock label={"Any other details / Conditions"} value={selectedMale?.any_other_details} />
+              <LabelValueBlock
+                label={"Any other details / Conditions"}
+                value={selectedMale?.any_other_details}
+              />
             </div>
 
             {/* Girl */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"Any other details / Conditions"} value={selectedFemale?.any_other_details} align="right" />
+              <LabelValueBlock
+                label={"Any other details / Conditions"}
+                value={selectedFemale?.any_other_details}
+                align="right"
+              />
             </div>
           </div>
 
-
           <div className="interactive-card">
-
             {/* Boy */}
             <div className="label-value-container-left">
               <LabelValueBlock label={"Any other details / Conditions"}>
                 <div className="flex gap-2.5 justify-center items-center">
-                  <span className="text-lg font-normal text-n-600">Father: <span className="font-medium text-n-900">{selectedMale?.father_bari}</span></span>
-                  <span className="text-lg font-normal text-n-600">Mother: <span className="font-medium text-n-900">{selectedMale?.mother_bari}</span></span>
+                  <span className="text-lg font-normal text-n-600">
+                    Father:{" "}
+                    <span className="font-medium text-n-900">
+                      {selectedMale?.father_bari}
+                    </span>
+                  </span>
+                  <span className="text-lg font-normal text-n-600">
+                    Mother:{" "}
+                    <span className="font-medium text-n-900">
+                      {selectedMale?.mother_bari}
+                    </span>
+                  </span>
                 </div>
               </LabelValueBlock>
             </div>
 
             {/* Girl */}
             <div className="label-value-container-right">
-              <LabelValueBlock label={"Any other details / Conditions"} align="right">
+              <LabelValueBlock
+                label={"Any other details / Conditions"}
+                align="right"
+              >
                 <div className="flex gap-2.5 justify-center items-center">
-                  <span className="text-lg font-normal text-n-600">Father: <span className="font-medium text-n-900">{selectedFemale?.father_bari}</span></span>
-                  <span className="text-lg font-normal text-n-600">Mother: <span className="font-medium text-n-900">{selectedFemale?.mother_bari}</span></span>
+                  <span className="text-lg font-normal text-n-600">
+                    Father:{" "}
+                    <span className="font-medium text-n-900">
+                      {selectedFemale?.father_bari}
+                    </span>
+                  </span>
+                  <span className="text-lg font-normal text-n-600">
+                    Mother:{" "}
+                    <span className="font-medium text-n-900">
+                      {selectedFemale?.mother_bari}
+                    </span>
+                  </span>
                 </div>
               </LabelValueBlock>
             </div>
@@ -448,20 +597,23 @@ const HomeScreen: React.FC = () => {
           </div>
         </div>
 
-
         {/* GIRLS PHOTO SIDE */}
         <div className="w-116 flex flex-col items-center gap-4 px-5 py-8">
           <div className="rounded-3xl w-full">
             <Image src={ProfileImage} alt="omkar" className="w-full" />
           </div>
           {/* Button */}
-          <Button className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"  onClick={()=>{ selectedMale && initSendMessage(selectedMale)}}>
+          <Button
+            className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
+            onClick={() => {
+              selectedMale && initSendMessage(selectedMale);
+            }}
+          >
             <Image src={ShareIcon} alt="share" />
             Send Boys Details
           </Button>
         </div>
       </div>
-
 
       {/* Separation Line */}
       <div className="flex justify-between gap-3.5 ">
@@ -473,15 +625,11 @@ const HomeScreen: React.FC = () => {
         </div>
       </div>
 
-
       {/* PARENTS DETAILS */}
       <div className=" px-5 py-8 flex justify-between gap-3.5 ">
-
-
         {/* Boy Side Parents */}
         <div className="flex w-1/2 gap-12 px-5 items-center">
-
-        {/* Father Details */}
+          {/* Father Details */}
           <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
             <span className="text-xl font-semibold text-n-900 p-with-before">
               Father’s Details
@@ -491,7 +639,10 @@ const HomeScreen: React.FC = () => {
             <LabelValueBlock label="Name" value={selectedMale?.father_name} />
 
             {/* Boy - Father Employee Details */}
-            <LabelValueBlock label="Employee Details" value={selectedMale?.father_emp_details} />
+            <LabelValueBlock
+              label="Employee Details"
+              value={selectedMale?.father_emp_details}
+            />
           </div>
 
           {/* Separater */}
@@ -506,14 +657,16 @@ const HomeScreen: React.FC = () => {
             <LabelValueBlock label="Name" value={selectedMale?.mother_name} />
 
             {/* Boy - Mother Employee Details */}
-            <LabelValueBlock label="Employee Details" value={selectedMale?.mother_emp_details} />
+            <LabelValueBlock
+              label="Employee Details"
+              value={selectedMale?.mother_emp_details}
+            />
           </div>
         </div>
 
         {/* Girl Side Parents */}
         <div className="flex w-1/2 gap-12 px-5 items-center">
-
-        {/* Father Details */}
+          {/* Father Details */}
           <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
             <span className="text-xl font-semibold text-n-900 p-with-before">
               Father’s Details
@@ -523,7 +676,10 @@ const HomeScreen: React.FC = () => {
             <LabelValueBlock label="Name" value={selectedFemale?.father_name} />
 
             {/* GIrl - Father Employee Details */}
-            <LabelValueBlock label="Employee Details" value={selectedFemale?.father_emp_details} />
+            <LabelValueBlock
+              label="Employee Details"
+              value={selectedFemale?.father_emp_details}
+            />
           </div>
 
           {/* Separater */}
@@ -538,7 +694,10 @@ const HomeScreen: React.FC = () => {
             <LabelValueBlock label="Name" value={selectedFemale?.mother_name} />
 
             {/* GIrl - Mother Employee Details */}
-            <LabelValueBlock label="Employee Details" value={selectedFemale?.mother_emp_details} />
+            <LabelValueBlock
+              label="Employee Details"
+              value={selectedFemale?.mother_emp_details}
+            />
           </div>
         </div>
       </div>
@@ -555,14 +714,12 @@ const HomeScreen: React.FC = () => {
 
       {/* Footer Section */}
       <div className=" px-5 py-8 flex gap-3.5">
-
         {/* BOY - Contact Details */}
         <div className="flex flex-col w-1/2 gap-2.5 px-5 justify-start items-start">
           <span className="text-xl font-semibold text-n-900 p-with-before">
             Contact Details
           </span>
           <div className="flex gap-7 justify-start items-center">
-
             {/* ADDRESS */}
             <div className="flex flex-col gap-1 justify-start items-start">
               <LabelValueBlock label="Address" value={selectedMale?.address} />
@@ -572,10 +729,10 @@ const HomeScreen: React.FC = () => {
             <div className="flex flex-col gap-1 justify-start items-start">
               <LabelValueBlock label="Email">
                 <Link href={`${selectedMale?.email}`}>
-                <span className="text-lg font-medium text-n-900">
-                  {selectedMale?.email}
-                </span>
-              </Link>
+                  <span className="text-lg font-medium text-n-900">
+                    {selectedMale?.email}
+                  </span>
+                </Link>
               </LabelValueBlock>
             </div>
 
@@ -593,9 +750,8 @@ const HomeScreen: React.FC = () => {
                     {selectedMale?.mob2}
                   </span>
                 </Link>
-                </LabelValueBlock>
+              </LabelValueBlock>
             </div>
-
           </div>
         </div>
 
@@ -605,20 +761,22 @@ const HomeScreen: React.FC = () => {
             Contact Details
           </span>
           <div className="flex gap-7 justify-start items-center">
-
             {/* ADDRESS */}
             <div className="flex flex-col gap-1 justify-start items-start">
-              <LabelValueBlock label="Address" value={selectedFemale?.address} />
+              <LabelValueBlock
+                label="Address"
+                value={selectedFemale?.address}
+              />
             </div>
 
             {/* EMAIL */}
             <div className="flex flex-col gap-1 justify-start items-start">
               <LabelValueBlock label="Email">
                 <Link href={`${selectedFemale?.email}`}>
-                <span className="text-lg font-medium text-n-900">
-                  {selectedFemale?.email ? selectedFemale.email : "-"}
-                </span>
-              </Link>
+                  <span className="text-lg font-medium text-n-900">
+                    {selectedFemale?.email ? selectedFemale.email : "-"}
+                  </span>
+                </Link>
               </LabelValueBlock>
             </div>
 
@@ -636,12 +794,10 @@ const HomeScreen: React.FC = () => {
                     {selectedFemale?.mob2}
                   </span>
                 </Link>
-                </LabelValueBlock>
+              </LabelValueBlock>
             </div>
-            
           </div>
         </div>
-
       </div>
     </div>
   );
