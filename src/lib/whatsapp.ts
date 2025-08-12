@@ -214,7 +214,8 @@ export function normalizePhone(
   defaultCountryCode = "91"
 ): string | null {
   if (!raw) return null;
-  const digits = raw.replace(/\D/g, ""); // strip non-digits
+
+  const digits = raw.toString().replace(/\D/g, ""); // strip non-digits
   if (!digits) return null;
 
   // Already has country code? (very rough check: 10-digit local assumed Indian)
@@ -231,12 +232,12 @@ export function normalizePhone(
  * Optional: explicitly force Web WhatsApp on desktop.
  * (wa.me usually redirects correctly, but you can use this if you prefer.)
  */
-export function buildWebWhatsAppLink(message: string, phone?: string) {
+export function buildWebWhatsAppLink(message: string, phone: string) {
   const encoded = encodeURIComponent(message);
-  // const normalized = normalizePhone("918369377673" || "");
+  const normalized = normalizePhone(phone || "");
 
-  if (true) {
-    return `https://web.whatsapp.com/send?phone=918369377673&text=${encoded}`;
+  if (normalized) {
+    return `https://web.whatsapp.com/send?phone=${normalized}&text=${encoded}`;
   }
   return `https://web.whatsapp.com/send?text=${encoded}`;
 }

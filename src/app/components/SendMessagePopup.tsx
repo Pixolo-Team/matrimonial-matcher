@@ -6,12 +6,8 @@ import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-// OTHERS //
-import {
-  buildFullWhatsAppMessage,
-  buildPartialWhatsAppMessage,
-  buildWebWhatsAppLink,
-} from "@/lib/whatsapp";
+// UTILS //
+import { Profile } from "@/lib/matchmaking.util";
 
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
@@ -19,8 +15,6 @@ import ShareIcon from "@/../public/icons/share.svg";
 type SendMessagePopupProps = {
   isVisible: boolean;
   onClose: () => void;
-  sendTo: string;
-  user: any;
   sendBasicDetails?: () => void;
   sendFullDetails?: () => void;
 };
@@ -28,8 +22,6 @@ type SendMessagePopupProps = {
 export default function SendMessagePopup({
   isVisible,
   onClose,
-  sendTo,
-  user,
   sendBasicDetails,
   sendFullDetails,
 }: SendMessagePopupProps) {
@@ -41,30 +33,6 @@ export default function SendMessagePopup({
     if (e.target === overlayRef.current) {
       onClose();
     }
-  };
-
-  /** Send Whatsapp Message */
-  const sendWhatsappMessage = () => {
-    const fullMsg = buildFullWhatsAppMessage(user);
-    const shortMsg = buildPartialWhatsAppMessage(user, {
-      include: [
-        "code_no",
-        "name",
-        "gender",
-        "date_of_birth",
-        "age",
-        "height",
-        "working_or_own_venture",
-        "designation",
-        "employer",
-        "working_location",
-        "mob1",
-      ],
-      title: "Candidate Snapshot",
-    });
-
-    const webWhatsappLink = buildWebWhatsAppLink(shortMsg, sendTo);
-    console.log("WhatsApp Web Link:", webWhatsappLink);
   };
 
   useEffect(() => {

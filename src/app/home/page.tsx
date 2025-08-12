@@ -1,7 +1,6 @@
 "use client";
 // REACT //
 import React, { useState, useEffect, useCallback } from "react";
-import useEmblaCarousel from "embla-carousel-react";
 
 // COMPONENTS //
 import Image from "next/image";
@@ -13,6 +12,7 @@ import MatchBadge from "../components/MatchBadge";
 import MainHeader from "../components/MainHeader";
 import { SectionDivider } from "../components/SectionDivider";
 import { ContactSection } from "../components/ContactSection";
+import FullPageLoader from "../components/FullPageLoader";
 
 // CONSTANTS //
 import { SHEET_URL } from "@/constants";
@@ -65,7 +65,7 @@ const HomeScreen: React.FC = () => {
   };
 
   /** Opens WhatsApp Web with a message and optional phone number */
-  const openWhatsApp = (msg: string, to?: string) => {
+  const openWhatsApp = (msg: string, to: string) => {
     // Generate WhatsApp link
     const url = buildWebWhatsAppLink(msg, to);
     // Open in new tab; on mobile, browser redirects to app
@@ -120,9 +120,9 @@ const HomeScreen: React.FC = () => {
       const gender =
         profile.gender?.toLowerCase() || profile.sex?.toLowerCase();
 
-      if (gender === "male") {
+      if (gender === "groom") {
         males.push(profile);
-      } else if (gender === "female") {
+      } else if (gender === "bride") {
         females.push(profile);
       }
     });
@@ -180,530 +180,543 @@ const HomeScreen: React.FC = () => {
   }, [calculateRating]);
 
   return (
-    <div className="bg-slate-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-slate-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-slate-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
-      {/* Popup that comes on Send Message */}
-      <SendMessagePopup
-        isVisible={sendMessageVisible}
-        onClose={closeSendPopup}
-        sendTo={"2342"}
-        user={selectedUser}
-        sendBasicDetails={handleSendBasic}
-        sendFullDetails={handleSendFull}
-      />
-      {/* Header Section  */}
-      <MainHeader
-        maleProfiles={maleProfiles}
-        femaleProfiles={femaleProfiles}
-        selectedMaleIndex={selectedMaleIndex}
-        setSelectedMaleIndex={setSelectedMaleIndex}
-        selectedFemaleIndex={selectedFemaleIndex}
-        setSelectedFemaleIndex={setSelectedFemaleIndex}
-        showArrowsWhenMoreThan={3}
+    <>
+      {/* Full Page Loader */}
+      <FullPageLoader
+        isLoading={loading}
+        text="Loading matrimonial profiles..."
       />
 
-      {/* Separation Component */}
-      <SectionDivider direction="horizontal" />
+      <div className="bg-slate-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-slate-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-slate-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
+        {/* Popup that comes on Send Message */}
+        {selectedUser && (
+          <SendMessagePopup
+            isVisible={sendMessageVisible}
+            onClose={closeSendPopup}
+            sendBasicDetails={handleSendBasic}
+            sendFullDetails={handleSendFull}
+          />
+        )}
 
-      {/* Main Content Section */}
-      <div className="flex">
-        {/* Boys Profile Image Wrapper */}
-        <div className="w-116 flex flex-col items-center gap-4 px-5 py-8 ">
-          {/* Profile Image Slider */}
-          {maleProfiles[selectedMaleIndex] && (
-            <PhotoSlider
-              profile={maleProfiles[selectedMaleIndex]}
-              alt="Profile photo"
-              loop={false}
-            />
-          )}
+        {/* Header Section  */}
+        <MainHeader
+          maleProfiles={maleProfiles}
+          femaleProfiles={femaleProfiles}
+          selectedMaleIndex={selectedMaleIndex}
+          setSelectedMaleIndex={setSelectedMaleIndex}
+          selectedFemaleIndex={selectedFemaleIndex}
+          setSelectedFemaleIndex={setSelectedFemaleIndex}
+          showArrowsWhenMoreThan={3}
+        />
 
-          {/* Button */}
-          <Button
-            className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
-            onClick={() => {
-              femaleProfiles[selectedFemaleIndex] &&
-                initSendMessage(femaleProfiles[selectedFemaleIndex]);
-            }}
-          >
-            <Image src={ShareIcon} alt="share" /> 
-            Send Girls Details
-          </Button>
-        </div>
+        {/* Separation Component */}
+        <SectionDivider direction="horizontal" />
 
-        {/* Middle Content Section */}
-        <div className="w-2/3 flex flex-col py-8">
-          {/* Box 1  */}
-          <div className="interactive-card ">
-            {/* Boy Title */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-n-900">
-                {maleProfiles[selectedMaleIndex]?.name}
-              </span>
-              <span className="size-3 bg-yellow-500 rounded-full"></span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="size-3 bg-yellow-500 rounded-full"></span>
-              <span className="text-3xl font-bold text-n-900">
-                {femaleProfiles[selectedFemaleIndex]?.name}
-              </span>
-            </div>
+        {/* Main Content Section */}
+        <div className="flex">
+          {/* Boys Profile Image Wrapper */}
+          <div className="w-116 flex flex-col items-center gap-4 px-5 py-8 ">
+            {/* Profile Image Slider */}
+            {maleProfiles[selectedMaleIndex] && (
+              <PhotoSlider
+                profile={maleProfiles[selectedMaleIndex]}
+                alt="Profile photo"
+                loop={false}
+              />
+            )}
 
-            {/* Match Score Badge Component */}
-            <MatchBadge score={compatibilityRating} />
+            {/* Button */}
+            <Button
+              className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
+              onClick={() => {
+                if (femaleProfiles[selectedFemaleIndex])
+                  initSendMessage(femaleProfiles[selectedFemaleIndex]);
+              }}
+            >
+              <Image src={ShareIcon} alt="share" />
+              Send Girls Details
+            </Button>
           </div>
 
-          {/* DOB */}
-          <div
-            className={`interactive-card ${checkMatch(
-              "age",
-              maleProfiles[selectedMaleIndex]?.age,
-              femaleProfiles[selectedFemaleIndex]?.age
-            )}`}
-          >
-            {/* Boy - DOB */}
-            <div className="label-value-container-left">
-              <LabelValueBlock label="Date of Birth">
-                <div className="flex flex-col  justify-start items-start">
-                  <div className="flex gap-2 justify-center items-center">
-                    <span className="text-lg font-medium text-n-900">
-                      {maleProfiles[selectedMaleIndex]?.date_of_birth}
-                    </span>
-                    <span className="text-xl font-medium text-n-600">
-                      ({maleProfiles[selectedMaleIndex]?.age})
-                    </span>
+          {/* Middle Content Section */}
+          <div className="w-2/3 flex flex-col py-8">
+            {/* Box 1  */}
+            <div className="interactive-card ">
+              {/* Boy Title */}
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-n-900">
+                  {maleProfiles[selectedMaleIndex]?.name}
+                </span>
+                <span className="size-3 bg-yellow-500 rounded-full"></span>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="size-3 bg-yellow-500 rounded-full"></span>
+                <span className="text-3xl font-bold text-n-900">
+                  {femaleProfiles[selectedFemaleIndex]?.name}
+                </span>
+              </div>
+
+              {/* Match Score Badge Component */}
+              <MatchBadge score={compatibilityRating} />
+            </div>
+
+            {/* DOB */}
+            <div
+              className={`interactive-card ${checkMatch(
+                "age",
+                maleProfiles[selectedMaleIndex]?.age,
+                femaleProfiles[selectedFemaleIndex]?.age
+              )}`}
+            >
+              {/* Boy - DOB */}
+              <div className="label-value-container-left">
+                <LabelValueBlock label="Date of Birth">
+                  <div className="flex flex-col  justify-start items-start">
+                    <div className="flex gap-2 justify-center items-center">
+                      <span className="text-lg font-medium text-n-900">
+                        {maleProfiles[selectedMaleIndex]?.date_of_birth}
+                      </span>
+                      <span className="text-xl font-medium text-n-600">
+                        ({maleProfiles[selectedMaleIndex]?.age})
+                      </span>
+                    </div>
+                    <div className="flex gap-2.5 justify-start items-center">
+                      <span className="text-sm font-normal text-n-900">
+                        {maleProfiles[selectedMaleIndex]?.birth_day}
+                      </span>
+                      <div className="flex justify-start items-start"></div>
+                      <span className="text-sm font-normal text-n-900">
+                        {maleProfiles[selectedMaleIndex]?.birth_time}
+                      </span>
+                      <div className="flex justify-start items-start"></div>
+                      <span className="text-sm font-normal text-n-900">
+                        {maleProfiles[selectedMaleIndex]?.birth_place}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex gap-2.5 justify-start items-center">
-                    <span className="text-sm font-normal text-n-900">
-                      {maleProfiles[selectedMaleIndex]?.birth_day}
-                    </span>
-                    <div className="flex justify-start items-start"></div>
-                    <span className="text-sm font-normal text-n-900">
-                      {maleProfiles[selectedMaleIndex]?.birth_time}
-                    </span>
-                    <div className="flex justify-start items-start"></div>
-                    <span className="text-sm font-normal text-n-900">
-                      {maleProfiles[selectedMaleIndex]?.birth_place}
-                    </span>
+                </LabelValueBlock>
+              </div>
+
+              {/* Girl - DOB */}
+              <div className="label-value-container-right">
+                <LabelValueBlock label="Date of Birth" align="right">
+                  <div className="flex flex-col  justify-start items-end">
+                    <div className="flex gap-2 justify-center items-center">
+                      <span className="text-lg font-medium text-n-900">
+                        {femaleProfiles[selectedFemaleIndex]?.date_of_birth}
+                      </span>
+                      <span className="text-xl font-medium text-n-600">
+                        ({femaleProfiles[selectedFemaleIndex]?.age})
+                      </span>
+                    </div>
+                    <div className="flex gap-2.5 justify-start items-center">
+                      <span className="text-sm font-normal text-n-900">
+                        {femaleProfiles[selectedFemaleIndex]?.birth_day}
+                      </span>
+                      <div className="flex justify-start items-start"></div>
+                      <span className="text-sm font-normal text-n-900">
+                        {femaleProfiles[selectedFemaleIndex]?.birth_time}
+                      </span>
+                      <div className="flex justify-start items-start"></div>
+                      <span className="text-sm font-normal text-n-900">
+                        {femaleProfiles[selectedFemaleIndex]?.birth_place}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </LabelValueBlock>
+                </LabelValueBlock>
+              </div>
+              <span className="no-match-reason">Less than</span>
+              <span className="yes-match-reason">More than</span>
             </div>
 
-            {/* Girl - DOB */}
-            <div className="label-value-container-right">
-              <LabelValueBlock label="Date of Birth" align="right">
-                <div className="flex flex-col  justify-start items-end">
-                  <div className="flex gap-2 justify-center items-center">
-                    <span className="text-lg font-medium text-n-900">
-                      {femaleProfiles[selectedFemaleIndex]?.date_of_birth}
-                    </span>
-                    <span className="text-xl font-medium text-n-600">
-                      ({femaleProfiles[selectedFemaleIndex]?.age})
-                    </span>
-                  </div>
-                  <div className="flex gap-2.5 justify-start items-center">
-                    <span className="text-sm font-normal text-n-900">
-                      {femaleProfiles[selectedFemaleIndex]?.birth_day}
-                    </span>
-                    <div className="flex justify-start items-start"></div>
-                    <span className="text-sm font-normal text-n-900">
-                      {femaleProfiles[selectedFemaleIndex]?.birth_time}
-                    </span>
-                    <div className="flex justify-start items-start"></div>
-                    <span className="text-sm font-normal text-n-900">
-                      {femaleProfiles[selectedFemaleIndex]?.birth_place}
-                    </span>
-                  </div>
-                </div>
-              </LabelValueBlock>
-            </div>
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
-          </div>
+            {/* HEIGHT */}
+            <div
+              className={`interactive-card ${checkMatch(
+                "height",
+                maleProfiles[selectedMaleIndex]?.height,
+                femaleProfiles[selectedFemaleIndex]?.height
+              )}`}
+            >
+              {/* Boy Height */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Height"}
+                  value={maleProfiles[selectedMaleIndex]?.height}
+                />
+              </div>
 
-          {/* HEIGHT */}
-          <div
-            className={`interactive-card ${checkMatch(
-              "height",
-              maleProfiles[selectedMaleIndex]?.height,
-              femaleProfiles[selectedFemaleIndex]?.height
-            )}`}
-          >
-            {/* Boy Height */}
-            <div className="label-value-container-left">
-              <LabelValueBlock
-                label={"Height"}
-                value={maleProfiles[selectedMaleIndex]?.height}
-              />
+              {/* Girl Height */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Height"}
+                  value={femaleProfiles[selectedFemaleIndex]?.height}
+                  align="right"
+                />
+              </div>
+
+              {/* Reasons for Yes / No */}
+              <span className="no-match-reason">Less than</span>
+              <span className="yes-match-reason">More than</span>
             </div>
 
-            {/* Girl Height */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"Height"}
-                value={femaleProfiles[selectedFemaleIndex]?.height}
-                align="right"
-              />
+            {/* NAKSHATRA / RASHI */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Nakshatra | Rashi"}
+                  value={`${maleProfiles[selectedMaleIndex]?.nakshatra} | ${maleProfiles[selectedMaleIndex]?.rashi}`}
+                />
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Nakshatra | Rashi"}
+                  value={`${femaleProfiles[selectedFemaleIndex]?.nakshatra} | ${femaleProfiles[selectedFemaleIndex]?.rashi}`}
+                  align="right"
+                />
+              </div>
             </div>
 
-            {/* Reasons for Yes / No */}
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
-          </div>
+            {/* EDUCATION */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Education"}
+                  value={maleProfiles[selectedMaleIndex]?.edu_qualifications}
+                />
+              </div>
 
-          {/* NAKSHATRA / RASHI */}
-          <div className="interactive-card">
-            {/* Boy */}
-            <div className="label-value-container-left">
-              <LabelValueBlock
-                label={"Nakshatra | Rashi"}
-                value={`${maleProfiles[selectedMaleIndex]?.nakshatra} | ${maleProfiles[selectedMaleIndex]?.rashi}`}
-              />
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Education"}
+                  value={
+                    femaleProfiles[selectedFemaleIndex]?.edu_qualifications
+                  }
+                  align="right"
+                />
+              </div>
             </div>
 
-            {/* Girl */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"Nakshatra | Rashi"}
-                value={`${femaleProfiles[selectedFemaleIndex]?.nakshatra} | ${femaleProfiles[selectedFemaleIndex]?.rashi}`}
-                align="right"
-              />
-            </div>
-          </div>
+            {/* WORKING / OWN VENTURE */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Working / Own Venture"}
+                  value={
+                    maleProfiles[selectedMaleIndex]?.working_or_own_venture
+                  }
+                />
+              </div>
 
-          {/* EDUCATION */}
-          <div className="interactive-card">
-            {/* Boy */}
-            <div className="label-value-container-left">
-              <LabelValueBlock
-                label={"Education"}
-                value={maleProfiles[selectedMaleIndex]?.edu_qualifications}
-              />
-            </div>
-
-            {/* Girl */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"Education"}
-                value={femaleProfiles[selectedFemaleIndex]?.edu_qualifications}
-                align="right"
-              />
-            </div>
-          </div>
-
-          {/* WORKING / OWN VENTURE */}
-          <div className="interactive-card">
-            {/* Boy */}
-            <div className="label-value-container-left">
-              <LabelValueBlock
-                label={"Working / Own Venture"}
-                value={maleProfiles[selectedMaleIndex]?.working_or_own_venture}
-              />
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Working / Own Venture"}
+                  value={
+                    femaleProfiles[selectedFemaleIndex]?.working_or_own_venture
+                  }
+                  align="right"
+                />
+              </div>
             </div>
 
-            {/* Girl */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"Working / Own Venture"}
-                value={
-                  femaleProfiles[selectedFemaleIndex]?.working_or_own_venture
-                }
-                align="right"
-              />
-            </div>
-          </div>
+            {/* WORKING LOCATION */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Working Location"}
+                  value={maleProfiles[selectedMaleIndex]?.working_location}
+                />
+              </div>
 
-          {/* WORKING LOCATION */}
-          <div className="interactive-card">
-            {/* Boy */}
-            <div className="label-value-container-left">
-              <LabelValueBlock
-                label={"Working Location"}
-                value={maleProfiles[selectedMaleIndex]?.working_location}
-              />
-            </div>
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Working Location"}
+                  value={femaleProfiles[selectedFemaleIndex]?.working_location}
+                  align="right"
+                />
+              </div>
 
-            {/* Girl */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"Working Location"}
-                value={femaleProfiles[selectedFemaleIndex]?.working_location}
-                align="right"
-              />
+              {/* Match Reasons */}
+              <span className="no-match-reason">Less than</span>
+              <span className="yes-match-reason">More than</span>
             </div>
 
-            {/* Match Reasons */}
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
-          </div>
+            {/* SALARY */}
+            <div
+              className={`interactive-card ${checkMatch(
+                "height",
+                maleProfiles[selectedMaleIndex]?.salary_pm,
+                femaleProfiles[selectedFemaleIndex]?.salary_pm
+              )}`}
+            >
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Salary PM"}
+                  value={maleProfiles[selectedMaleIndex]?.salary_pm}
+                />
+              </div>
 
-          {/* SALARY */}
-          <div
-            className={`interactive-card ${checkMatch(
-              "height",
-              maleProfiles[selectedMaleIndex]?.salary_pm,
-              femaleProfiles[selectedFemaleIndex]?.salary_pm
-            )}`}
-          >
-            {/* Boy */}
-            <div className="label-value-container-left">
-              <LabelValueBlock
-                label={"Salary PM"}
-                value={maleProfiles[selectedMaleIndex]?.salary_pm}
-              />
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Salary PM"}
+                  value={femaleProfiles[selectedFemaleIndex]?.salary_pm}
+                  align="right"
+                />
+              </div>
+
+              {/* Match Reasons */}
+              <span className="no-match-reason">Less than</span>
+              <span className="yes-match-reason">More than</span>
             </div>
 
-            {/* Girl */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"Salary PM"}
-                value={femaleProfiles[selectedFemaleIndex]?.salary_pm}
-                align="right"
-              />
+            {/* 1ST MARRIAGE / DIVORCEE */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"1st Marriage / Divorcee"}
+                  value={
+                    maleProfiles[selectedMaleIndex]?.is_divorced
+                      ? "Divorcee"
+                      : maleProfiles[selectedMaleIndex]?.is_first_marriage
+                      ? "1st Marriage"
+                      : "Married Before"
+                  }
+                />
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"1st Marriage / Divorcee"}
+                  value={
+                    femaleProfiles[selectedFemaleIndex]?.is_divorced
+                      ? "Divorcee"
+                      : femaleProfiles[selectedFemaleIndex]?.is_first_marriage
+                      ? "1st Marriage"
+                      : "Married Before"
+                  }
+                  align="right"
+                />
+              </div>
+
+              {/* Match Reasons */}
+              <span className="no-match-reason">Less than</span>
+              <span className="yes-match-reason">More than</span>
             </div>
 
-            {/* Match Reasons */}
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
-          </div>
+            {/* OTHER DETAILS */}
+            <div className={`interactive-card`}>
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Any other details / Conditions"}
+                  value={maleProfiles[selectedMaleIndex]?.any_other_details}
+                />
+              </div>
 
-          {/* 1ST MARRIAGE / DIVORCEE */}
-          <div className="interactive-card">
-            {/* Boy */}
-            <div className="label-value-container-left">
-              <LabelValueBlock
-                label={"1st Marriage / Divorcee"}
-                value={
-                  maleProfiles[selectedMaleIndex]?.is_divorced
-                    ? "Divorcee"
-                    : maleProfiles[selectedMaleIndex]?.is_first_marriage
-                    ? "1st Marriage"
-                    : "Married Before"
-                }
-              />
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Any other details / Conditions"}
+                  value={femaleProfiles[selectedFemaleIndex]?.any_other_details}
+                  align="right"
+                />
+              </div>
             </div>
 
-            {/* Girl */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"1st Marriage / Divorcee"}
-                value={
-                  femaleProfiles[selectedFemaleIndex]?.is_divorced
-                    ? "Divorcee"
-                    : femaleProfiles[selectedFemaleIndex]?.is_first_marriage
-                    ? "1st Marriage"
-                    : "Married Before"
-                }
-                align="right"
-              />
-            </div>
-
-            {/* Match Reasons */}
-            <span className="no-match-reason">Less than</span>
-            <span className="yes-match-reason">More than</span>
-          </div>
-
-          {/* OTHER DETAILS */}
-          <div className={`interactive-card`}>
-            {/* Boy */}
-            <div className="label-value-container-left">
-              <LabelValueBlock
-                label={"Any other details / Conditions"}
-                value={maleProfiles[selectedMaleIndex]?.any_other_details}
-              />
-            </div>
-
-            {/* Girl */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"Any other details / Conditions"}
-                value={femaleProfiles[selectedFemaleIndex]?.any_other_details}
-                align="right"
-              />
-            </div>
-          </div>
-
-          <div
-            className={`interactive-card ${checkMatch(
-              "mother_bari",
-              maleProfiles[selectedMaleIndex]?.mother_bari,
-              femaleProfiles[selectedFemaleIndex]?.mother_bari
-            )}`}
-          >
-            {/* Boy */}
-            <div className="label-value-container-left">
-              <LabelValueBlock label={"Any other details / Conditions"}>
-                <div className="flex gap-2.5 justify-center items-center">
-                  <span className="text-lg font-normal text-n-600">
-                    Father:{" "}
-                    <span className="font-medium text-n-900">
-                      {maleProfiles[selectedMaleIndex]?.father_bari}
-                    </span>
-                  </span>
-                  <span className="text-lg font-normal text-n-600">
-                    Mother:{" "}
-                    <span className="font-medium text-n-900">
-                      {maleProfiles[selectedMaleIndex]?.mother_bari}
-                    </span>
-                  </span>
-                </div>
-              </LabelValueBlock>
-            </div>
-
-            {/* Girl */}
-            <div className="label-value-container-right">
-              <LabelValueBlock
-                label={"Any other details / Conditions"}
-                align="right"
-              >
-                <div className="flex gap-2.5 justify-center items-center">
-                  <span className="text-lg font-normal text-n-600">
-                    Father:{" "}
+            <div
+              className={`interactive-card ${checkMatch(
+                "mother_bari",
+                maleProfiles[selectedMaleIndex]?.mother_bari,
+                femaleProfiles[selectedFemaleIndex]?.mother_bari
+              )}`}
+            >
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock label={"Any other details / Conditions"}>
+                  <div className="flex gap-2.5 justify-center items-center">
                     <span className="text-lg font-normal text-n-600">
-                      {femaleProfiles[selectedFemaleIndex]?.father_bari}
+                      Father:{" "}
+                      <span className="font-medium text-n-900">
+                        {maleProfiles[selectedMaleIndex]?.father_bari}
+                      </span>
                     </span>
-                  </span>
-                  <span className="text-lg font-normal text-n-600">
-                    Mother:{" "}
-                    <span className="font-medium text-n-900">
-                      {femaleProfiles[selectedFemaleIndex]?.mother_bari}
+                    <span className="text-lg font-normal text-n-600">
+                      Mother:{" "}
+                      <span className="font-medium text-n-900">
+                        {maleProfiles[selectedMaleIndex]?.mother_bari}
+                      </span>
                     </span>
-                  </span>
-                </div>
-              </LabelValueBlock>
+                  </div>
+                </LabelValueBlock>
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Any other details / Conditions"}
+                  align="right"
+                >
+                  <div className="flex gap-2.5 justify-center items-center">
+                    <span className="text-lg font-normal text-n-600">
+                      Father:{" "}
+                      <span className="text-lg font-normal text-n-600">
+                        {femaleProfiles[selectedFemaleIndex]?.father_bari}
+                      </span>
+                    </span>
+                    <span className="text-lg font-normal text-n-600">
+                      Mother:{" "}
+                      <span className="font-medium text-n-900">
+                        {femaleProfiles[selectedFemaleIndex]?.mother_bari}
+                      </span>
+                    </span>
+                  </div>
+                </LabelValueBlock>
+              </div>
+
+              {/* Match Reasons */}
+              <span className="no-match-reason">Is same as</span>
+              <span className="yes-match-reason">Is different than</span>
+            </div>
+          </div>
+
+          {/* GIRLS PHOTO SIDE */}
+          <div className="w-116 flex flex-col items-center gap-4 px-5 py-8">
+            {femaleProfiles[selectedFemaleIndex] && (
+              <PhotoSlider
+                profile={femaleProfiles[selectedFemaleIndex]}
+                alt="Profile photo"
+                loop={false}
+              />
+            )}
+
+            {/* Button */}
+            <Button
+              className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
+              onClick={() => {
+                if (maleProfiles[selectedMaleIndex])
+                  initSendMessage(maleProfiles[selectedMaleIndex]);
+              }}
+            >
+              <Image src={ShareIcon} alt="share" />
+              Send Boys Details
+            </Button>
+          </div>
+        </div>
+
+        {/* Separation Component */}
+        <SectionDivider direction="horizontal" />
+
+        {/* PARENTS DETAILS */}
+        <div className=" px-5 py-8 flex justify-between gap-3.5 ">
+          {/* Boy Side Parents */}
+          <div className="flex w-1/2 gap-12 px-5 items-center">
+            {/* Father Details */}
+            <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
+              <span className="text-xl font-semibold text-n-900 p-with-before">
+                Father’s Details
+              </span>
+
+              {/* Boy - Father Name */}
+              <LabelValueBlock
+                label="Name"
+                value={maleProfiles[selectedMaleIndex]?.father_name}
+              />
+
+              {/* Boy - Father Employee Details */}
+              <LabelValueBlock
+                label="Employee Details"
+                value={maleProfiles[selectedMaleIndex]?.father_emp_details}
+              />
             </div>
 
-            {/* Match Reasons */}
-            <span className="no-match-reason">Is same as</span>
-            <span className="yes-match-reason">Is different than</span>
+            {/* Separater Component */}
+            <SectionDivider direction="vertical" />
+
+            {/* Mother Details */}
+            <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
+              <span className="text-xl font-semibold text-n-900 p-with-before">
+                Mother’s Details
+              </span>
+              {/* Boy - Mother Name */}
+              <LabelValueBlock
+                label="Name"
+                value={maleProfiles[selectedMaleIndex]?.mother_name}
+              />
+
+              {/* Boy - Mother Employee Details */}
+              <LabelValueBlock
+                label="Employee Details"
+                value={maleProfiles[selectedMaleIndex]?.mother_emp_details}
+              />
+            </div>
+          </div>
+
+          {/* Girl Side Parents */}
+          <div className="flex w-1/2 gap-12 px-5 items-center">
+            {/* Father Details */}
+            <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
+              <span className="text-xl font-semibold text-n-900 p-with-before">
+                Father’s Details
+              </span>
+
+              {/* GIrl - Father Name */}
+              <LabelValueBlock
+                label="Name"
+                value={femaleProfiles[selectedFemaleIndex]?.father_name}
+              />
+
+              {/* GIrl - Father Employee Details */}
+              <LabelValueBlock
+                label="Employee Details"
+                value={femaleProfiles[selectedFemaleIndex]?.father_emp_details}
+              />
+            </div>
+
+            {/* Separater Component */}
+            <SectionDivider direction="vertical" />
+
+            {/* Mother Details */}
+            <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
+              <span className="text-xl font-semibold text-n-900 p-with-before">
+                Mother’s Details
+              </span>
+              {/* GIrl - Mother Name */}
+              <LabelValueBlock
+                label="Name"
+                value={femaleProfiles[selectedFemaleIndex]?.mother_name}
+              />
+
+              {/* GIrl - Mother Employee Details */}
+              <LabelValueBlock
+                label="Employee Details"
+                value={femaleProfiles[selectedFemaleIndex]?.mother_emp_details}
+              />
+            </div>
           </div>
         </div>
 
-        {/* GIRLS PHOTO SIDE */}
-        <div className="w-116 flex flex-col items-center gap-4 px-5 py-8">
-          {femaleProfiles[selectedFemaleIndex] && (
-            <PhotoSlider
-              profile={femaleProfiles[selectedFemaleIndex]}
-              alt="Profile photo"
-              loop={false}
-            />
-          )}
+        {/* Separation Component */}
+        <SectionDivider direction="horizontal" />
 
-          {/* Button */}
-          <Button
-            className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
-            onClick={() => {
-              maleProfiles[selectedMaleIndex] &&
-                initSendMessage(maleProfiles[selectedMaleIndex]);
-            }}
-          >
-            <Image src={ShareIcon} alt="share" />
-            Send Boys Details
-          </Button>
-        </div>
+        {/* Footer Section - Contact details for both male & female */}
+        <ContactSection
+          male={maleProfiles[selectedMaleIndex]}
+          female={femaleProfiles[selectedFemaleIndex]}
+        />
       </div>
-
-      {/* Separation Component */}
-      <SectionDivider direction="horizontal" />
-
-      {/* PARENTS DETAILS */}
-      <div className=" px-5 py-8 flex justify-between gap-3.5 ">
-        {/* Boy Side Parents */}
-        <div className="flex w-1/2 gap-12 px-5 items-center">
-          {/* Father Details */}
-          <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
-            <span className="text-xl font-semibold text-n-900 p-with-before">
-              Father’s Details
-            </span>
-
-            {/* Boy - Father Name */}
-            <LabelValueBlock
-              label="Name"
-              value={maleProfiles[selectedMaleIndex]?.father_name}
-            />
-
-            {/* Boy - Father Employee Details */}
-            <LabelValueBlock
-              label="Employee Details"
-              value={maleProfiles[selectedMaleIndex]?.father_emp_details}
-            />
-          </div>
-
-          {/* Separater Component */}
-          <SectionDivider direction="vertical" />
-
-          {/* Mother Details */}
-          <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
-            <span className="text-xl font-semibold text-n-900 p-with-before">
-              Mother’s Details
-            </span>
-            {/* Boy - Mother Name */}
-            <LabelValueBlock
-              label="Name"
-              value={maleProfiles[selectedMaleIndex]?.mother_name}
-            />
-
-            {/* Boy - Mother Employee Details */}
-            <LabelValueBlock
-              label="Employee Details"
-              value={maleProfiles[selectedMaleIndex]?.mother_emp_details}
-            />
-          </div>
-        </div>
-
-        {/* Girl Side Parents */}
-        <div className="flex w-1/2 gap-12 px-5 items-center">
-          {/* Father Details */}
-          <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
-            <span className="text-xl font-semibold text-n-900 p-with-before">
-              Father’s Details
-            </span>
-
-            {/* GIrl - Father Name */}
-            <LabelValueBlock
-              label="Name"
-              value={femaleProfiles[selectedFemaleIndex]?.father_name}
-            />
-
-            {/* GIrl - Father Employee Details */}
-            <LabelValueBlock
-              label="Employee Details"
-              value={femaleProfiles[selectedFemaleIndex]?.father_emp_details}
-            />
-          </div>
-
-          {/* Separater Component */}
-          <SectionDivider direction="vertical" />
-
-          {/* Mother Details */}
-          <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
-            <span className="text-xl font-semibold text-n-900 p-with-before">
-              Mother’s Details
-            </span>
-            {/* GIrl - Mother Name */}
-            <LabelValueBlock
-              label="Name"
-              value={femaleProfiles[selectedFemaleIndex]?.mother_name}
-            />
-
-            {/* GIrl - Mother Employee Details */}
-            <LabelValueBlock
-              label="Employee Details"
-              value={femaleProfiles[selectedFemaleIndex]?.mother_emp_details}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Separation Component */}
-      <SectionDivider direction="horizontal" />
-
-      {/* Footer Section - Contact details for both male & female */}
-      <ContactSection
-        male={maleProfiles[selectedMaleIndex]}
-        female={femaleProfiles[selectedFemaleIndex]}
-      />
-    </div>
+    </>
   );
 };
 

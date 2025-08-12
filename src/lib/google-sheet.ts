@@ -51,7 +51,7 @@ function parseSheetRows(json: any): SheetRow[] {
     row.c.reduce((acc: SheetRow, cell: any, i: number) => {
       const colLetter = colLetters[i];
       const key = columnMap[colLetter];
-      const value = cell?.v ?? "";
+      const value = cell?.v ?? "-";
 
       // Special handling for DOB
       if (key === "date_of_birth") {
@@ -67,8 +67,14 @@ function parseSheetRows(json: any): SheetRow[] {
         return acc;
       }
 
+      // Special Handling for photos
       if (key === "photo_1" || key === "photo_2" || key === "photo_3") {
-        acc[key] = normalizePhoto(String(value));
+        // If value is - then return empty to avoid ui break
+        if (value === "-") {
+          acc[key] = "";
+        } else {
+          acc[key] = normalizePhoto(String(value));
+        }
         return acc;
       } else {
         acc[key] = value;
@@ -86,9 +92,8 @@ function parseSheetRows(json: any): SheetRow[] {
  * Accepts: "yes", "true", "1" (case-insensitive).
  */
 function filterActiveRows(rows: SheetRow[]): SheetRow[] {
-  console.log(rows, "wahsajhdj");
   return rows.filter((row) => {
-    const isActiveKey = columnMap["AF"]; // last column in your sheet
+    const isActiveKey = columnMap["AI"]; // last column in your sheet
     const isActiveValue = row[isActiveKey]?.toString().toLowerCase().trim();
     return isActiveValue === "yes";
   });
@@ -100,7 +105,6 @@ function filterActiveRows(rows: SheetRow[]): SheetRow[] {
  */
 export async function fetchSheetData(sheetUrl: string): Promise<SheetRow[]> {
   const rawJson = await fetchRawSheetJson(sheetUrl); // Step 1: Fetch + clean
-  console.log(rawJson, "asdjashd");
   const allRows = parseSheetRows(rawJson); // Step 2: Parse rows
   const activeRows = filterActiveRows(allRows); // Step 3: Filter
   return activeRows;
