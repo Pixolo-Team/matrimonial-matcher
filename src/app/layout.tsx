@@ -1,5 +1,4 @@
 // REACT //
-import { Suspense } from "react";
 import React from "react";
 
 // STYLES //
@@ -89,7 +88,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${neometricFont.className} antialiased`}>
-          {children}
+        {children}
       </body>
     </html>
   );

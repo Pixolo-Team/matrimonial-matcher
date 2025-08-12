@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 // UTILS //
-import { Profile } from "@/lib/matchmaking.util";
 
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";

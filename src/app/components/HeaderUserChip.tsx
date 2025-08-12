@@ -1,5 +1,5 @@
 // COMPONENTS //
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 
 /* Header User chip component */
 const HeaderUserChip: React.FC<{
