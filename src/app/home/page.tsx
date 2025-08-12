@@ -6,13 +6,13 @@ import useEmblaCarousel from "embla-carousel-react";
 // COMPONENTS //
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import LabelValueBlock from "../components/LabelValueBlock";
 import SendMessagePopup from "../components/SendMessagePopup";
 import PhotoSlider from "../components/PhotoSlider";
-import HeaderUserChip from "../components/HeaderUserChip";
 import MatchBadge from "../components/MatchBadge";
-import SliderArrow from "../components/SliderArrow";
+import MainHeader from "../components/MainHeader";
+import { SectionDivider } from "../components/SectionDivider";
+import { ContactSection } from "../components/ContactSection";
 
 // CONSTANTS //
 import { SHEET_URL } from "@/constants";
@@ -32,12 +32,6 @@ import {
   buildWebWhatsAppLink,
 } from "@/lib/whatsapp";
 
-// IMAGES //
-import ProfileImage from "@/../public/assets/images/main-profile.webp";
-import GirlProfileImage from "@/../public/assets/images/omkar-crush.jpg";
-import BoyProfileImage from "@/../public/assets/images/main-profile.png";
-import UserThumbImage from "@/../public/assets/images/user-photo.png";
-
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
 
@@ -48,48 +42,39 @@ const HomeScreen: React.FC = () => {
   const [maleProfiles, setMaleProfiles] = useState<Profile[]>([]);
   const [femaleProfiles, setFemaleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [whatsappMessage, setWhatsappMessage] = useState<string>("");
   const [selectedMaleIndex, setSelectedMaleIndex] = useState<number>(0);
   const [selectedFemaleIndex, setSelectedFemaleIndex] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [compatibilityRating, setCompatibilityRating] = useState<number>(0);
 
   // Helper Functions
-  const [boysRef, boysApi] = useEmblaCarousel({
-    dragFree: true,
-    containScroll: "trimSnaps",
-  });
-  const [girlsRef, girlsApi] = useEmblaCarousel({
-    dragFree: true,
-    containScroll: "trimSnaps",
-  });
-
-  /** Toggle the Popup */
-  const toggleSendPopup = () => {
-    setSendMessageVisible((prev) => !prev);
-  };
-
   /** Open Send Message Popup */
   const initSendMessage = (user: Profile) => {
+    // Set selected profile
     setSelectedUser(user);
+    // Show popup
     setSendMessageVisible(true);
   };
 
-  // close popup
+  /** Close Send Message popup */
   const closeSendPopup = () => {
+    // Hide popup
     setSendMessageVisible(false);
+    // TODO: Remove if not needed
     // setSelectedUser(null); // optional
   };
 
-  // helpers to open WhatsApp
+  /** Opens WhatsApp Web with a message and optional phone number */
   const openWhatsApp = (msg: string, to?: string) => {
-    const url = buildWebWhatsAppLink(msg, to); // uses normalizePhone internally
-    // open in new tab; on mobile, browser redirects to app
+    // Generate WhatsApp link
+    const url = buildWebWhatsAppLink(msg, to);
+    // Open in new tab; on mobile, browser redirects to app
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  // send basic
+  /** Sends basic profile details via WhatsApp */
   const handleSendBasic = () => {
+    // No user selected
     if (!selectedUser) return;
     const msg = buildPartialWhatsAppMessage(selectedUser, {
       include: [
@@ -107,21 +92,25 @@ const HomeScreen: React.FC = () => {
       ],
       title: "Candidate Snapshot",
     });
-    openWhatsApp(msg, selectedUser.mob1); // or use a fixed `sendTo`
+
+    // Send message
+    openWhatsApp(msg, selectedUser.mob1);
+    // Close popup after sending
     closeSendPopup();
   };
 
-  // send full
+  /** Sends full profile details via WhatsApp */
   const handleSendFull = () => {
+    // No user selected
     if (!selectedUser) return;
     const msg = buildFullWhatsAppMessage(selectedUser);
-    openWhatsApp(msg, selectedUser.mob1); // or a fixed `sendTo`
+    // Send message
+    openWhatsApp(msg, selectedUser.mob1);
+    // Close popup after sending
     closeSendPopup();
   };
 
-  /**
-   * Separates a list of profiles into male and female groups based on the gender field.
-   */
+  /** Separates a list of profiles into male and female groups based on the gender field. */
   function separateProfilesByGender(profiles: Profile[]) {
     const males: Profile[] = [];
     const females: Profile[] = [];
@@ -138,54 +127,55 @@ const HomeScreen: React.FC = () => {
       }
     });
 
+    // Return grouped profiles
     return { males, females };
   }
 
-  /** Process the raw data ans store it in profile states */
+  /** Fetches data from Google Sheet and processes it into male/female lists */
   const loadAndProcessData = useCallback(async () => {
     try {
+      // Fetch sheet data
       const rawProfiles = await fetchSheetData(SHEET_URL);
-
+      // Split into groups
       const { males, females } = separateProfilesByGender(rawProfiles);
-
+      // Store male profiles
       setMaleProfiles(males);
+      // Store female profiles
       setFemaleProfiles(females);
+      // Error
     } catch (error) {
+      // Log error
       console.error("Error loading data:", error);
     } finally {
+      // Stop loading state
       setLoading(false);
     }
   }, []);
 
-  /** Calculate Compatibility Rating */
+  /** Calculates compatibility rating between selected male and female profiles */
   const calculateRating = useCallback(async () => {
     const score = Number(
       calculateCompatibilityRating(
+        // Selected male profile
         maleProfiles[selectedMaleIndex],
+        // Selected female profile
         femaleProfiles[selectedFemaleIndex]
       )
     );
+
+    // Update Rating
     setCompatibilityRating(Number.isFinite(score) ? score : 0);
   }, [femaleProfiles, maleProfiles, selectedFemaleIndex, selectedMaleIndex]);
-  // TODO: Remove later
-  const BoysImgs = [
-    "/assets/images/main-profile.webp",
-    "/assets/images/omkar-2.png",
-    "/assets/images/omkar-2.png",
-    "/assets/images/omkar-2.png",
-  ];
-  // TODO: Remove later
-  const GirlsImgs = [
-    "/assets/images/main-profile.webp",
-    "/assets/images/main-profile.webp",
-  ];
 
+  // UseEffect
   useEffect(() => {
+    // Fetch data
     loadAndProcessData();
   }, [loadAndProcessData, selectedUser]);
 
   // Recalculate rating on every profile change
   useEffect(() => {
+    // Calculate rating
     calculateRating();
   }, [calculateRating]);
 
@@ -200,95 +190,20 @@ const HomeScreen: React.FC = () => {
         sendBasicDetails={handleSendBasic}
         sendFullDetails={handleSendFull}
       />
-
       {/* Header Section  */}
-      <div className=" flex gap-3.5 justify-between">
-        {/* Boys Header */}
-        <div className="relative flex w-1/2 py-2 px-9 overflow-hidden">
-          {/* Slider Arrow Component - Right*/}
-          {maleProfiles.length > 3 && (
-            <div
-              className="absolute top-1/2 left-3 -translate-y-1/2 z-10"
-              onClick={() => boysApi?.scrollPrev()}
-            >
-              <SliderArrow direction="left" />
-            </div>
-          )}
-          <div className="overflow-hidden w-full" ref={boysRef}>
-            <div className="flex gap-3.5">
-              {/* Boy Header Chip Component */}
-              {maleProfiles.map((male, index) => {
-                return (
-                  <HeaderUserChip
-                    key={index + male.name}
-                    src={male.photo_1}
-                    name={male.name ?? "Candidate Name"}
-                    age={male.age}
-                    isActive={selectedMaleIndex === index}
-                    onClick={() => setSelectedMaleIndex(index)}
-                  />
-                );
-              })}
-            </div>
-          </div>
-          {/* Slider Arrow Component - Right */}
-          {maleProfiles.length > 3 && (
-            <div
-              className="absolute top-1/2 right-3 -translate-y-1/2 z-10"
-              onClick={() => boysApi?.scrollNext()}
-            >
-              <SliderArrow direction="right" />
-            </div>
-          )}
-        </div>
-        {/* Girls Header */}
-        <div className="relative flex w-1/2 py-2 px-9">
-          {/* Slider Arrow Component - Left */}
-          {femaleProfiles.length > 3 && (
-            <div
-              className="absolute top-1/2 left-3 -translate-y-1/2 z-10"
-              onClick={() => girlsApi?.scrollPrev()}
-            >
-              <SliderArrow direction="left" />
-            </div>
-          )}
-          <div className="overflow-hidden w-full" ref={girlsRef}>
-            <div className="flex gap-3.5 ">
-              {/* Girl Header Chip Component */}
-              {femaleProfiles.map((female, index) => {
-                return (
-                  <HeaderUserChip
-                    key={index + female.name}
-                    src={female.photo_1}
-                    name={female.name ?? "Candidate Name"}
-                    age={female.age}
-                    isActive={selectedFemaleIndex === index}
-                    onClick={() => setSelectedFemaleIndex(index)}
-                  />
-                );
-              })}
-            </div>
-          </div>
-          {/* Slider Arrow Component - Right */}
-          {femaleProfiles.length > 3 && (
-            <div
-              className="absolute top-1/2 right-3 -translate-y-1/2"
-              onClick={() => girlsApi?.scrollNext()}
-            >
-              <SliderArrow direction="right" />
-            </div>
-          )}
-        </div>
-      </div>
-      {/* Separation */}
-      <div className="flex justify-between gap-3.5 ">
-        <div className="w-1/2 h-px px-12">
-          <div className=" h-px bg-slate-300"></div>
-        </div>
-        <div className="w-1/2 h-px px-12">
-          <div className=" h-px bg-slate-300"></div>
-        </div>
-      </div>
+      <MainHeader
+        maleProfiles={maleProfiles}
+        femaleProfiles={femaleProfiles}
+        selectedMaleIndex={selectedMaleIndex}
+        setSelectedMaleIndex={setSelectedMaleIndex}
+        selectedFemaleIndex={selectedFemaleIndex}
+        setSelectedFemaleIndex={setSelectedFemaleIndex}
+        showArrowsWhenMoreThan={3}
+      />
+
+      {/* Separation Component */}
+      <SectionDivider direction="horizontal" />
+
       {/* Main Content Section */}
       <div className="flex">
         {/* Boys Profile Image Wrapper */}
@@ -301,18 +216,21 @@ const HomeScreen: React.FC = () => {
               loop={false}
             />
           )}
+
           {/* Button */}
           <Button
             className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
             onClick={() => {
-              if (selectedFemaleIndex)
+              femaleProfiles[selectedFemaleIndex] &&
                 initSendMessage(femaleProfiles[selectedFemaleIndex]);
             }}
           >
-            <Image src={ShareIcon} alt="share" />
+            <Image src={ShareIcon} alt="share" /> 
             Send Girls Details
           </Button>
         </div>
+
+        {/* Middle Content Section */}
         <div className="w-2/3 flex flex-col py-8">
           {/* Box 1  */}
           <div className="interactive-card ">
@@ -667,7 +585,7 @@ const HomeScreen: React.FC = () => {
             <PhotoSlider
               profile={femaleProfiles[selectedFemaleIndex]}
               alt="Profile photo"
-              loop
+              loop={false}
             />
           )}
 
@@ -685,15 +603,8 @@ const HomeScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Separation Line */}
-      <div className="flex justify-between gap-3.5 ">
-        <div className="w-1/2 h-px px-12">
-          <div className=" h-px bg-slate-300"></div>
-        </div>
-        <div className="w-1/2 h-px px-12">
-          <div className=" h-px bg-slate-300"></div>
-        </div>
-      </div>
+      {/* Separation Component */}
+      <SectionDivider direction="horizontal" />
 
       {/* PARENTS DETAILS */}
       <div className=" px-5 py-8 flex justify-between gap-3.5 ">
@@ -718,8 +629,8 @@ const HomeScreen: React.FC = () => {
             />
           </div>
 
-          {/* Separater */}
-          <span className="w-px h-4/5 bg-slate-300"></span>
+          {/* Separater Component */}
+          <SectionDivider direction="vertical" />
 
           {/* Mother Details */}
           <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
@@ -761,8 +672,8 @@ const HomeScreen: React.FC = () => {
             />
           </div>
 
-          {/* Separater */}
-          <span className="w-px h-4/5 bg-slate-300"></span>
+          {/* Separater Component */}
+          <SectionDivider direction="vertical" />
 
           {/* Mother Details */}
           <div className="flex flex-col flex-1 gap-2.5 justify-start items-start">
@@ -784,108 +695,14 @@ const HomeScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Separation */}
-      <div className="flex justify-between gap-3.5 ">
-        <div className="w-1/2 h-px px-12">
-          <div className=" h-px bg-slate-300"></div>
-        </div>
-        <div className="w-1/2 h-px px-12">
-          <div className=" h-px bg-slate-300"></div>
-        </div>
-      </div>
+      {/* Separation Component */}
+      <SectionDivider direction="horizontal" />
 
-      {/* Footer Section */}
-      <div className=" px-5 py-8 flex gap-3.5">
-        {/* BOY - Contact Details */}
-        <div className="flex flex-col w-1/2 gap-2.5 px-5 justify-start items-start">
-          <span className="text-xl font-semibold text-n-900 p-with-before">
-            Contact Details
-          </span>
-          <div className="flex gap-7 justify-start items-center">
-            {/* ADDRESS */}
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <LabelValueBlock
-                label="Address"
-                value={maleProfiles[selectedMaleIndex]?.address}
-              />
-            </div>
-
-            {/* EMAIL */}
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <LabelValueBlock label="Email">
-                <Link href={`${maleProfiles[selectedMaleIndex]?.email}`}>
-                  <span className="text-lg font-medium text-n-900">
-                    {maleProfiles[selectedMaleIndex]?.email}
-                  </span>
-                </Link>
-              </LabelValueBlock>
-            </div>
-
-            {/* MOBILE */}
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <LabelValueBlock label="Mobile">
-                <Link href={`tel:${maleProfiles[selectedMaleIndex]?.mob1}`}>
-                  <span className="text-lg font-medium text-n-900">
-                    {maleProfiles[selectedMaleIndex]?.mob1}
-                  </span>
-                </Link>
-                <span>/</span>
-                <Link href={`tel:${maleProfiles[selectedMaleIndex]?.mob2}`}>
-                  <span className="text-lg font-medium text-n-900">
-                    {maleProfiles[selectedMaleIndex]?.mob2}
-                  </span>
-                </Link>
-              </LabelValueBlock>
-            </div>
-          </div>
-        </div>
-
-        {/* Girl - Contact Details */}
-        <div className="flex flex-col w-1/2 gap-2.5 px-5 justify-start items-start">
-          <span className="text-xl font-semibold text-n-900 p-with-before">
-            Contact Details
-          </span>
-          <div className="flex gap-7 justify-start items-center">
-            {/* ADDRESS */}
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <LabelValueBlock
-                label="Address"
-                value={femaleProfiles[selectedFemaleIndex]?.address}
-              />
-            </div>
-
-            {/* EMAIL */}
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <LabelValueBlock label="Email">
-                <Link href={`${femaleProfiles[selectedFemaleIndex]?.email}`}>
-                  <span className="text-lg font-medium text-n-900">
-                    {femaleProfiles[selectedFemaleIndex]?.email
-                      ? femaleProfiles[selectedFemaleIndex]?.email
-                      : "-"}
-                  </span>
-                </Link>
-              </LabelValueBlock>
-            </div>
-
-            {/* MOBILE */}
-            <div className="flex flex-col gap-1 justify-start items-start">
-              <LabelValueBlock label="Mobile">
-                <Link href={`tel:${femaleProfiles[selectedFemaleIndex]?.mob1}`}>
-                  <span className="text-lg font-medium text-n-900">
-                    {femaleProfiles[selectedFemaleIndex]?.mob1}
-                  </span>
-                </Link>
-                <span>/</span>
-                <Link href={`tel:${femaleProfiles[selectedFemaleIndex]?.mob2}`}>
-                  <span className="text-lg font-medium text-n-900">
-                    {femaleProfiles[selectedFemaleIndex]?.mob2}
-                  </span>
-                </Link>
-              </LabelValueBlock>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Footer Section - Contact details for both male & female */}
+      <ContactSection
+        male={maleProfiles[selectedMaleIndex]}
+        female={femaleProfiles[selectedFemaleIndex]}
+      />
     </div>
   );
 };

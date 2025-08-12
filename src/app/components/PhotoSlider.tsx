@@ -1,9 +1,16 @@
 "use client";
-import React, { useEffect, useState, useMemo } from "react";
+// REACT //
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+
+// COMPONENTS //
 import Image from "next/image";
-import SliderArrow from "./SliderArrow";
+
+// UTILS //
 import { Profile } from "@/lib/matchmaking.util";
+
+// OTHERS //
+import SliderArrow from "./SliderArrow";
 
 interface PhotoSliderProps {
   profile: Profile;
@@ -25,11 +32,11 @@ const PhotoSlider: React.FC<PhotoSliderProps> = ({
     [profile]
   );
 
-  console.log(images);
-
-  // State
+  // Define States
   const [isPrevImg, setIsPrevImg] = useState(false);
   const [isNextImg, setIsNextImg] = useState(images.length > 1);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
   // Embla Carousel
   const [viewportRef, emblaApi] = useEmblaCarousel({
@@ -38,16 +45,24 @@ const PhotoSlider: React.FC<PhotoSliderProps> = ({
     align: "start",
   });
 
+  const updateUi = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+    setIsPrevImg(emblaApi.canScrollPrev());
+    setIsNextImg(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  // UseEffect
   useEffect(() => {
     if (!emblaApi) return;
-    const updateUi = () => {
-      setIsPrevImg(emblaApi.canScrollPrev());
-      setIsNextImg(emblaApi.canScrollNext());
-    };
-    emblaApi.on("select", updateUi);
-    emblaApi.on("reInit", updateUi);
+    setScrollSnaps(emblaApi.scrollSnapList());
     updateUi();
-  }, [emblaApi]);
+    emblaApi.on("select", updateUi);
+    emblaApi.on("reInit", () => {
+      setScrollSnaps(emblaApi.scrollSnapList());
+      updateUi();
+    });
+  }, [emblaApi, updateUi]);
 
   return (
     <div className="relative w-full">
@@ -93,6 +108,22 @@ const PhotoSlider: React.FC<PhotoSliderProps> = ({
       >
         <SliderArrow direction="right" />
       </button>
+
+      {/* Slider dot indicator */}
+      <div className=" absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-3">
+        {scrollSnaps.map((snapItem, snapItemIndex) => (
+          <button
+            key={`${snapItem}-${snapItemIndex}`}
+            className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
+              snapItemIndex === selectedIndex
+                ? "bg-slate-50 h-2.5 w-2.5"
+                : "bg-slate-300"
+            }`}
+            onClick={() => emblaApi?.scrollTo(snapItemIndex)}
+            aria-label={`Go to slide ${snapItemIndex + 1}`}
+          />
+        ))}
+      </div>
     </div>
   );
 };
