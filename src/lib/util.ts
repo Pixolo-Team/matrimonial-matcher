@@ -86,3 +86,19 @@ export function toDriveDirectView(url: string): string {
   const id = extractDriveFileId(url);
   return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
 }
+
+export function calculateAge(dob: string | Date): string {
+  if (!dob) return "0";
+  const birthDate = dob instanceof Date ? dob : new Date(dob);
+  if (isNaN(birthDate.getTime())) return "0";
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+  return age.toString();
+}

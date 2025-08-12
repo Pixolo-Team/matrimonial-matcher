@@ -13,6 +13,7 @@ import MainHeader from "../components/MainHeader";
 import { SectionDivider } from "../components/SectionDivider";
 import { ContactSection } from "../components/ContactSection";
 import FullPageLoader from "../components/FullPageLoader";
+import Toast from "../components/Toast";
 
 // CONSTANTS //
 import { SHEET_URL } from "@/constants";
@@ -46,6 +47,16 @@ const HomeScreen: React.FC = () => {
   const [selectedFemaleIndex, setSelectedFemaleIndex] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [compatibilityRating, setCompatibilityRating] = useState<number>(0);
+  const [showMatchLines, setShowMatchLines] = useState<boolean>(true);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "info" | "warning";
+    isVisible: boolean;
+  }>({
+    message: "",
+    type: "info",
+    isVisible: false,
+  });
 
   // Helper Functions
   /** Open Send Message Popup */
@@ -62,6 +73,11 @@ const HomeScreen: React.FC = () => {
     setSendMessageVisible(false);
     // TODO: Remove if not needed
     // setSelectedUser(null); // optional
+  };
+
+  /** Close toast notification */
+  const closeToast = () => {
+    setToast((prev) => ({ ...prev, isVisible: false }));
   };
 
   /** Opens WhatsApp Web with a message and optional phone number */
@@ -92,7 +108,6 @@ const HomeScreen: React.FC = () => {
       ],
       title: "Candidate Snapshot",
     });
-
     // Send message
     openWhatsApp(msg, selectedUser.mob1);
     // Close popup after sending
@@ -179,6 +194,32 @@ const HomeScreen: React.FC = () => {
     calculateRating();
   }, [calculateRating]);
 
+  // Keyboard shortcut to toggle match lines
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Press 'H' to toggle match lines visibility
+      if (event.key.toLowerCase() === "h") {
+        const newState = !showMatchLines;
+        setShowMatchLines(newState);
+
+        // Show toast notification
+        setToast({
+          message: `Match lines ${newState ? "enabled" : "disabled"}`,
+          type: newState ? "success" : "warning",
+          isVisible: true,
+        });
+      }
+    };
+
+    // Add event listener
+    document.addEventListener("keydown", handleKeyPress);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [showMatchLines]);
+
   return (
     <>
       {/* Full Page Loader */}
@@ -262,11 +303,15 @@ const HomeScreen: React.FC = () => {
 
             {/* DOB */}
             <div
-              className={`interactive-card ${checkMatch(
-                "age",
-                maleProfiles[selectedMaleIndex]?.age,
-                femaleProfiles[selectedFemaleIndex]?.age
-              )}`}
+              className={`interactive-card ${
+                showMatchLines
+                  ? checkMatch(
+                      "age",
+                      maleProfiles[selectedMaleIndex]?.age,
+                      femaleProfiles[selectedFemaleIndex]?.age
+                    )
+                  : ""
+              }`}
             >
               {/* Boy - DOB */}
               <div className="label-value-container-left">
@@ -331,11 +376,15 @@ const HomeScreen: React.FC = () => {
 
             {/* HEIGHT */}
             <div
-              className={`interactive-card ${checkMatch(
-                "height",
-                maleProfiles[selectedMaleIndex]?.height,
-                femaleProfiles[selectedFemaleIndex]?.height
-              )}`}
+              className={`interactive-card ${
+                showMatchLines
+                  ? checkMatch(
+                      "height",
+                      maleProfiles[selectedMaleIndex]?.height,
+                      femaleProfiles[selectedFemaleIndex]?.height
+                    )
+                  : ""
+              }`}
             >
               {/* Boy Height */}
               <div className="label-value-container-left">
@@ -355,8 +404,12 @@ const HomeScreen: React.FC = () => {
               </div>
 
               {/* Reasons for Yes / No */}
-              <span className="no-match-reason">Less than</span>
-              <span className="yes-match-reason">More than</span>
+              {showMatchLines && (
+                <>
+                  <span className="no-match-reason">Less than</span>
+                  <span className="yes-match-reason">More than</span>
+                </>
+              )}
             </div>
 
             {/* NAKSHATRA / RASHI */}
@@ -426,7 +479,17 @@ const HomeScreen: React.FC = () => {
             </div>
 
             {/* WORKING LOCATION */}
-            <div className="interactive-card">
+            <div
+              className={`interactive-card ${
+                showMatchLines
+                  ? checkMatch(
+                      "working_location",
+                      maleProfiles[selectedMaleIndex]?.working_location,
+                      femaleProfiles[selectedFemaleIndex]?.working_location
+                    )
+                  : ""
+              }`}
+            >
               {/* Boy */}
               <div className="label-value-container-left">
                 <LabelValueBlock
@@ -445,17 +508,25 @@ const HomeScreen: React.FC = () => {
               </div>
 
               {/* Match Reasons */}
-              <span className="no-match-reason">Less than</span>
-              <span className="yes-match-reason">More than</span>
+              {showMatchLines && (
+                <>
+                  <span className="no-match-reason">Different</span>
+                  <span className="yes-match-reason">Same</span>
+                </>
+              )}
             </div>
 
             {/* SALARY */}
             <div
-              className={`interactive-card ${checkMatch(
-                "height",
-                maleProfiles[selectedMaleIndex]?.salary_pm,
-                femaleProfiles[selectedFemaleIndex]?.salary_pm
-              )}`}
+              className={`interactive-card ${
+                showMatchLines
+                  ? checkMatch(
+                      "salary_pm",
+                      maleProfiles[selectedMaleIndex]?.salary_pm,
+                      femaleProfiles[selectedFemaleIndex]?.salary_pm
+                    )
+                  : ""
+              }`}
             >
               {/* Boy */}
               <div className="label-value-container-left">
@@ -475,12 +546,30 @@ const HomeScreen: React.FC = () => {
               </div>
 
               {/* Match Reasons */}
-              <span className="no-match-reason">Less than</span>
-              <span className="yes-match-reason">More than</span>
+              {showMatchLines && (
+                <>
+                  <span className="no-match-reason">Less than</span>
+                  <span className="yes-match-reason">More than</span>
+                </>
+              )}
             </div>
 
             {/* 1ST MARRIAGE / DIVORCEE */}
-            <div className="interactive-card">
+            <div
+              className={`interactive-card ${
+                showMatchLines
+                  ? checkMatch(
+                      "marriage_status",
+                      maleProfiles[selectedMaleIndex]?.is_first_marriage
+                        ? "first"
+                        : "not_first",
+                      femaleProfiles[selectedFemaleIndex]?.is_first_marriage
+                        ? "first"
+                        : "not_first"
+                    )
+                  : ""
+              }`}
+            >
               {/* Boy */}
               <div className="label-value-container-left">
                 <LabelValueBlock
@@ -511,8 +600,12 @@ const HomeScreen: React.FC = () => {
               </div>
 
               {/* Match Reasons */}
-              <span className="no-match-reason">Less than</span>
-              <span className="yes-match-reason">More than</span>
+              {showMatchLines && (
+                <>
+                  <span className="no-match-reason">Different</span>
+                  <span className="yes-match-reason">Same</span>
+                </>
+              )}
             </div>
 
             {/* OTHER DETAILS */}
@@ -536,11 +629,15 @@ const HomeScreen: React.FC = () => {
             </div>
 
             <div
-              className={`interactive-card ${checkMatch(
-                "mother_bari",
-                maleProfiles[selectedMaleIndex]?.mother_bari,
-                femaleProfiles[selectedFemaleIndex]?.mother_bari
-              )}`}
+              className={`interactive-card ${
+                showMatchLines
+                  ? checkMatch(
+                      "mother_bari",
+                      maleProfiles[selectedMaleIndex]?.mother_bari,
+                      femaleProfiles[selectedFemaleIndex]?.mother_bari
+                    )
+                  : ""
+              }`}
             >
               {/* Boy */}
               <div className="label-value-container-left">
@@ -586,8 +683,12 @@ const HomeScreen: React.FC = () => {
               </div>
 
               {/* Match Reasons */}
-              <span className="no-match-reason">Is same as</span>
-              <span className="yes-match-reason">Is different than</span>
+              {showMatchLines && (
+                <>
+                  <span className="no-match-reason">Same</span>
+                  <span className="yes-match-reason">Different</span>
+                </>
+              )}
             </div>
           </div>
 
@@ -716,6 +817,15 @@ const HomeScreen: React.FC = () => {
           female={femaleProfiles[selectedFemaleIndex]}
         />
       </div>
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={closeToast}
+        duration={2000}
+      />
     </>
   );
 };

@@ -2,6 +2,7 @@
 
 import { columnMap } from "@/constants";
 import {
+  calculateAge,
   formatDateLong,
   formatTime12h,
   parseGvizDate,
@@ -56,10 +57,13 @@ function parseSheetRows(json: any): SheetRow[] {
       // Special handling for DOB
       if (key === "date_of_birth") {
         const dateObj = parseGvizDate(value);
-        acc[key] = formatDateLong(dateObj); // "15 March 2001"
+        const formattedDate = formatDateLong(dateObj); // "15 March 2001"
+        acc[key] = formattedDate;
+
+        // Also set computed age here
+        acc.age = calculateAge(dateObj ?? "");
         return acc;
       }
-
       // Special handling for Birth Time
       if (key === "birth_time") {
         const timeObj = parseGvizDate(value);
@@ -93,7 +97,7 @@ function parseSheetRows(json: any): SheetRow[] {
  */
 function filterActiveRows(rows: SheetRow[]): SheetRow[] {
   return rows.filter((row) => {
-    const isActiveKey = columnMap["AI"]; // last column in your sheet
+    const isActiveKey = columnMap["AH"]; // last column in your sheet
     const isActiveValue = row[isActiveKey]?.toString().toLowerCase().trim();
     return isActiveValue === "yes";
   });
