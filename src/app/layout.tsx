@@ -16,6 +16,8 @@ import type { Metadata } from "next";
 
 // THEME //
 
+// CONFIG //
+
 // Fetch Fonts
 const neometricFont = localFont({
   src: [
