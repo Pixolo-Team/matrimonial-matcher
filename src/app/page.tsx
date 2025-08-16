@@ -108,9 +108,16 @@ const HomeScreen: React.FC = () => {
       ],
       title: "Candidate Snapshot",
     });
-    // Send message
-    openWhatsApp(msg, selectedUser.mob1);
-    // Close popup after sending
+
+    // Determine recipient
+    const recipientNumber =
+      selectedUser.gender?.toLowerCase() === "groom"
+        ? femaleProfiles[selectedFemaleIndex]?.mob1
+        : maleProfiles[selectedMaleIndex]?.mob1;
+
+    // Send message to opposite party
+    if (recipientNumber) openWhatsApp(msg, recipientNumber);
+
     closeSendPopup();
   };
 
@@ -119,8 +126,16 @@ const HomeScreen: React.FC = () => {
     // No user selected
     if (!selectedUser) return;
     const msg = buildFullWhatsAppMessage(selectedUser);
-    // Send message
-    openWhatsApp(msg, selectedUser.mob1);
+
+    // Determine recipient
+    const recipientNumber =
+      selectedUser.gender?.toLowerCase() === "groom"
+        ? femaleProfiles[selectedFemaleIndex]?.mob1
+        : maleProfiles[selectedMaleIndex]?.mob1;
+
+    // Send message to opposite party
+    if (recipientNumber) openWhatsApp(msg, recipientNumber);
+
     // Close popup after sending
     closeSendPopup();
   };
