@@ -16,13 +16,14 @@ const HeaderUserChip: React.FC<{
     onClick={onClick}
   >
     {/* Profile image */}
-    <div className="object-contain w-[50] h-[50] rounded-xl overflow-hidden">
+    <div className=" w-[50] h-[50] rounded-xl overflow-hidden">
       <Image
         src={src}
         alt={name}
         width={50}
         height={50}
-        className="w-full h-full"
+        className="w-full h-full object-cover rounded-xl"
+        loading="lazy"
       />
     </div>
     <div className="flex flex-col">
