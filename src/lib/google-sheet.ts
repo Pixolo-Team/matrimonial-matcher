@@ -45,6 +45,63 @@ function normalizePhoto(url?: string) {
  * Converts Google's table format to an array of clean objects.
  * Each object represents a row, with column labels as keys.
  */
+// function parseSheetRows(json: any): SheetRow[] {
+//   const colLetters = Object.keys(columnMap);
+
+//   return json.table.rows.map((row: any) =>
+//     row.c.reduce((acc: SheetRow, cell: any, i: number) => {
+//       const colLetter = colLetters[i];
+//       const key = columnMap[colLetter];
+//       const value = cell?.v ?? "-";
+
+//       // Special handling for DOB
+//       if (key === "date_of_birth") {
+//         const dateObj = parseGvizDate(value);
+//         const formattedDate = formatDateLong(dateObj); // "15 March 2001"
+//         acc[key] = formattedDate;
+
+//         // Also set computed age here
+//         acc.age = calculateAge(dateObj ?? "");
+//         return acc;
+//       }
+
+//       // Special handling for Salary PM
+//       if (key === "salary_pm") {
+//         acc[key] = formatINR(value);
+//         return acc;
+//       }
+
+//       // Special handling for Birth Time
+//       if (key === "birth_time") {
+//         const timeObj = parseGvizDate(value);
+//         acc[key] = formatTime12h(timeObj); // "6:45 AM"
+//         return acc;
+//       }
+
+//       // Special Handling for photos
+//       if (key === "photo_1" || key === "photo_2" || key === "photo_3") {
+//         // If value is - then return empty to avoid ui break
+//         if (value === "-") {
+//           acc[key] = "";
+//         } else {
+//           acc[key] = normalizePhoto(String(value));
+//         }
+//         return acc;
+//       } else {
+//         acc[key] = value;
+//       }
+
+//       // Everything else
+//       acc[key] = value;
+//       return acc;
+//     }, {})
+//   );
+// }
+
+/**
+ * Converts Google's table format to an array of clean objects.
+ * Each object represents a row, with column labels as keys.
+ */
 function parseSheetRows(json: any): SheetRow[] {
   const colLetters = Object.keys(columnMap);
 
@@ -64,6 +121,7 @@ function parseSheetRows(json: any): SheetRow[] {
         acc.age = calculateAge(dateObj ?? "");
         return acc;
       }
+
       // Special handling for Birth Time
       if (key === "birth_time") {
         const timeObj = parseGvizDate(value);
@@ -73,22 +131,33 @@ function parseSheetRows(json: any): SheetRow[] {
 
       // Special Handling for photos
       if (key === "photo_1" || key === "photo_2" || key === "photo_3") {
-        // If value is - then return empty to avoid ui break
-        if (value === "-") {
-          acc[key] = "";
-        } else {
-          acc[key] = normalizePhoto(String(value));
-        }
+        // If value is "-" then return empty to avoid UI break
+        acc[key] = value === "-" ? "" : normalizePhoto(String(value));
         return acc;
-      } else {
-        acc[key] = value;
       }
 
-      // Everything else
+      // Special handling for Salary
+      if (key === "salary_pm") {
+        acc[key] = formatINR(value); // Format number to Indian commas
+        return acc;
+      }
+
+      // Default case for all other fields
       acc[key] = value;
       return acc;
     }, {})
   );
+}
+
+/**
+ * Format a number into Indian-style commas
+ * e.g., 100000 -> "1,00,000"
+ */
+function formatINR(value: string | number): string {
+  if (!value) return "-";
+  const num = Number(value);
+  if (isNaN(num)) return String(value);
+  return num.toLocaleString("en-IN");
 }
 
 /**

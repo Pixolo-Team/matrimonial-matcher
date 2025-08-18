@@ -1,3 +1,4 @@
+// REACT //
 import React, { useEffect } from "react";
 
 interface ToastProps {
@@ -8,6 +9,7 @@ interface ToastProps {
   duration?: number;
 }
 
+/** Toast Component */
 const Toast: React.FC<ToastProps> = ({
   message,
   type,
@@ -15,6 +17,8 @@ const Toast: React.FC<ToastProps> = ({
   onClose,
   duration = 3000,
 }) => {
+  
+  // UseEffect
   useEffect(() => {
     if (isVisible) {
       const timer = setTimeout(() => {
@@ -27,16 +31,17 @@ const Toast: React.FC<ToastProps> = ({
 
   if (!isVisible) return null;
 
+  /* Function to get toast styles based on toast type */
   const getToastStyles = () => {
     switch (type) {
       case "success":
-        return "bg-green-500 text-white";
+        return "bg-green-500 text-n-50";
       case "warning":
-        return "bg-yellow-500 text-slate-800";
+        return "bg-yellow-500 text-n-800";
       case "info":
-        return "bg-blue-500 text-white";
+        return "bg-blue-500 text-n-50";
       default:
-        return "bg-gray-500 text-white";
+        return "bg-n-500 text-n-50";
     }
   };
 

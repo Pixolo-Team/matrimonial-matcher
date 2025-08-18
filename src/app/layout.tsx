@@ -73,11 +73,11 @@ const neometricFont = localFont({
 
 // Metadata //
 export const metadata: Metadata = {
-  title: "Configo – DevOps Control Center",
+  title: "Billawar Matrimonial",
   description:
-    "Configo simplifies infrastructure management with intuitive deployments, environment control, and cloud automation — all from a single, powerful dashboard.",
+    "Billawar Matrimonial is a platform designed to connect individuals from the Billawar community, facilitating meaningful relationships and marriages.",
   icons: {
-    icon: "/favicon.png", // ✅ Path relative to public/
+    icon: "/favicon.svg", // ✅ Path relative to public/
   },
 };
 

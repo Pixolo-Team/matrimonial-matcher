@@ -7,7 +7,7 @@ const SliderArrow: React.FC<{
   return (
     <div
       className={
-        " cursor-pointer rounded-full border-1 border-slate-800 bg-slate-50 size-8 flex justify-center hover:bg-slate-200 transition-colors duration-300" +
+        " cursor-pointer rounded-full border-1 border-n-800 bg-n-50 size-8 flex justify-center hover:bg-n-200 transition-colors duration-300" +
         (direction === "right" ? " ml-2" : " mr-2")
       }
     >

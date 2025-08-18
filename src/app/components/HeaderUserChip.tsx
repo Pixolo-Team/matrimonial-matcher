@@ -12,17 +12,18 @@ const HeaderUserChip: React.FC<{
   // Chip container
   <div
     className={`min-w-[202px] rounded-2xl flex gap-2 px-3 py-2.5 items-center cursor-pointer
-      ${isActive ? "bg-yellow-500" : "hover:bg-slate-100"}`}
+      ${isActive ? "bg-primary-500" : "hover:bg-n-100"}`}
     onClick={onClick}
   >
     {/* Profile image */}
-    <div className="object-contain w-[50] h-[50] rounded-xl overflow-hidden">
+    <div className=" w-[50] h-[50] rounded-xl overflow-hidden">
       <Image
         src={src}
         alt={name}
         width={50}
         height={50}
-        className="w-full h-full"
+        className="w-full h-full object-cover rounded-xl"
+        loading="lazy"
       />
     </div>
     <div className="flex flex-col">
