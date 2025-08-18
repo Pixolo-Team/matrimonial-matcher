@@ -56,8 +56,9 @@
   --animate-fade-out: fade-out 0.3s ease-in-out forwards;
   --animate-slide-in: slide-in 0.3s ease-out forwards;
   --animate-slide-out: slide-out 0.3s ease-in forwards;
+  --color-yellow-500: #ffd60a;
   --color-primary-400: var(--color-yellow-400);
-  --color-primary-500: #ffd60a;
+  --color-primary-500: var(--color-yellow-500);
   --color-primary-600: var(--color-yellow-600);
 
   @keyframes fade-in {
