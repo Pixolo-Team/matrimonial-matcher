@@ -32,6 +32,7 @@ import {
   buildPartialWhatsAppMessage,
   buildWebWhatsAppLink,
 } from "@/lib/whatsapp";
+import { PrivateKeyInput } from "crypto";
 
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
@@ -88,74 +89,57 @@ const HomeScreen: React.FC = () => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  /** Sends basic profile details via WhatsApp */
-  const handleSendBasic = () => {
+  /** Sends profile details via WhatsApp */
+  const handleSend = (type: "basic" | "full") => {
     // No user selected
     if (!selectedUser) return;
+
+    // Normalize gender and pick the opposite user
+    const isGroom = selectedUser.gender?.toLowerCase() === "groom";
+    const receiverUser = isGroom
+      ? femaleProfiles[selectedFemaleIndex]
+      : maleProfiles[selectedMaleIndex];
+
+    // Build message
     const msg = buildPartialWhatsAppMessage(selectedUser, {
-      include: [
-        "code_no",
-        "name",
-        "gender",
-        "date_of_birth",
-        "age",
-        "height",
-        "working_or_own_venture",
-        "designation",
-        "employer",
-        "working_location",
-        "mob1",
-      ],
-      title: "Candidate Snapshot",
+      include:
+        type === "full"
+          ? [
+              "code_no",
+              "name",
+              "gender",
+              "date_of_birth",
+              "age",
+              "height",
+              "working_or_own_venture",
+              "designation",
+              "employer",
+              "working_location",
+              "mob1",
+              "photo_1",
+              "photo_2",
+              "photo_3",
+            ]
+          : [
+              "code_no",
+              "name",
+              "gender",
+              "date_of_birth",
+              "age",
+              "height",
+              "working_or_own_venture",
+              "designation",
+              "employer",
+              "working_location",
+              "mob1",
+            ],
+      title: `WE FORWARD HEREWITH DETAILS FOR A POSSIBLE MATCH FOR ${receiverUser.name} KINDLY GO THROUGH AND CONSIDER SUITABILITY AND DO CONTACT US IF YOU REQUIRE MORE DETAILS`,
     });
 
-    // Determine recipient
-    const recipientNumber =
-      selectedUser.gender?.toLowerCase() === "groom"
-        ? femaleProfiles[selectedFemaleIndex]?.mob1
-        : maleProfiles[selectedMaleIndex]?.mob1;
-
     // Send message to opposite party
-    if (recipientNumber) openWhatsApp(msg, recipientNumber);
+    openWhatsApp(msg, receiverUser.mob1);
 
-    closeSendPopup();
-  };
-
-  /** Sends full profile details via WhatsApp */
-  const handleSendFull = () => {
-    // No user selected
-    if (!selectedUser) return;
-    // Using partial message function to not send the full details
-    const msg = buildPartialWhatsAppMessage(selectedUser, {
-      include: [
-        "code_no",
-        "name",
-        "gender",
-        "date_of_birth",
-        "age",
-        "height",
-        "working_or_own_venture",
-        "designation",
-        "employer",
-        "working_location",
-        "mob1",
-        "photo_1",
-        "photo_2",
-        "photo_3"
-      ],
-      title: "Candidate Snapshot",
-    });
-
-    // Determine recipient
-    const recipientNumber =
-      selectedUser.gender?.toLowerCase() === "groom"
-        ? femaleProfiles[selectedFemaleIndex]?.mob1
-        : maleProfiles[selectedMaleIndex]?.mob1;
-
-    // Send message to opposite party
-    if (recipientNumber) openWhatsApp(msg, recipientNumber);
-
-    // Close popup after sending
+    // Close popup
     closeSendPopup();
   };
 
@@ -268,8 +252,8 @@ const HomeScreen: React.FC = () => {
           <SendMessagePopup
             isVisible={sendMessageVisible}
             onClose={closeSendPopup}
-            sendBasicDetails={handleSendBasic}
-            sendFullDetails={handleSendFull}
+            sendBasicDetails={() => handleSend("basic")}
+            sendFullDetails={() => handleSend("full")}
           />
         )}
 

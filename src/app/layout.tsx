@@ -77,7 +77,7 @@ export const metadata: Metadata = {
   description:
     "Billawar Matrimonial is a platform designed to connect individuals from the Billawar community, facilitating meaningful relationships and marriages.",
   icons: {
-    icon: "/favicon.png", // ✅ Path relative to public/
+    icon: "/favicon.svg", // ✅ Path relative to public/
   },
 };
 
