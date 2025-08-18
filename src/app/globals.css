@@ -56,7 +56,10 @@
   --animate-fade-out: fade-out 0.3s ease-in-out forwards;
   --animate-slide-in: slide-in 0.3s ease-out forwards;
   --animate-slide-out: slide-out 0.3s ease-in forwards;
-  --color-yellow-500: #FFD60A;
+  --color-yellow-500: #ffd60a;
+  --color-primary-400: var(--color-yellow-400);
+  --color-primary-500: var(--color-yellow-500);
+  --color-primary-600: var(--color-yellow-600);
 
   @keyframes fade-in {
     0% {
@@ -206,16 +209,16 @@
 }
 
 .interactive-card {
-  @apply relative border-[3px] border-transparent hover:border-yellow-500 transition-all flex justify-between gap-3.5 py-2 px-3.5;
+  @apply relative border-[3px] border-transparent hover:border-primary-500 transition-all flex justify-between gap-3.5 py-1.5 px-3;
 }
 
 .no-match {
-    @apply border-[3px] border-red-500 bg-red-100;
-  }
+  @apply border-[3px] border-red-500 bg-red-100;
+}
 
-  .yes-match {
-    @apply border-[3px] border-green-500 bg-green-100;
-  }
+.yes-match {
+  @apply border-[3px] border-green-500 bg-green-100;
+}
 
 @layer components {
   .p-with-before {
@@ -224,24 +227,24 @@
 
   .p-with-before::before {
     content: "";
-    @apply w-28 h-3 bg-yellow-500 absolute -bottom-px -left-1 -z-2;
+    @apply w-28 h-3 bg-primary-500 absolute -bottom-px -left-1 -z-2;
   }
   .p-common {
-      @apply relative bottom-[-4px] left-[-4px];
-    }
-    .no-match-reason {
-      @apply hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 px-2 py-1 text-sm text-slate-50;
-    }
-    .yes-match-reason {
-      @apply hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-500 px-2 py-1 text-sm text-slate-50;
-    }
+    @apply relative bottom-[-4px] left-[-4px];
+  }
+  .no-match-reason {
+    @apply hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 px-2 py-1 text-sm text-slate-50;
+  }
+  .yes-match-reason {
+    @apply hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-500 px-2 py-1 text-sm text-slate-50;
+  }
 
-    
+  
 }
 
 @layer utilities {
   
-
+  
   /* Show reason divs only when parent has the class */
   .no-match .no-match-reason {
     @apply block;
@@ -257,8 +260,13 @@
     @apply hidden;
   }
 
-  .no-scrollbar::-webkit-scrollbar { display: none; }      /* Chrome/Safari */
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  } /* Chrome/Safari */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 

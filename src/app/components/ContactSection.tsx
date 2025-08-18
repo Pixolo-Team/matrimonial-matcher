@@ -39,12 +39,15 @@ function ContactColumn({
       {/* Contact info container */}
       <div className="flex gap-7 justify-start items-center">
         {/* Address */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 ">
           <LabelValueBlock label="Address" value={address} />
         </div>
 
+        {/* Separator */}
+        <div className="bg-n-400 h-8 w-px"></div>
+
         {/* Email */}
-        <div className="flex flex-col gap-1 s">
+        <div className="flex flex-col gap-1">
           <LabelValueBlock label="Email">
             <Link href={`${email ?? ""}`}>
               <span className="text-lg font-medium text-n-900">
@@ -54,8 +57,11 @@ function ContactColumn({
           </LabelValueBlock>
         </div>
 
+        {/* Separator */}
+        <div className="bg-n-400 h-8 w-px"></div>
+
         {/* Mobile numbers */}
-        <div className="flex flex-col gap-1 ">
+        <div className="flex flex-col gap-1">
           <LabelValueBlock label="Mobile">
             {mob1 && (
               <Link href={`tel:${mob1}`}>

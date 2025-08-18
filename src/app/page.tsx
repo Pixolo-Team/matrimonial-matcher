@@ -32,6 +32,7 @@ import {
   buildPartialWhatsAppMessage,
   buildWebWhatsAppLink,
 } from "@/lib/whatsapp";
+import { PrivateKeyInput } from "crypto";
 
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
@@ -88,55 +89,57 @@ const HomeScreen: React.FC = () => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  /** Sends basic profile details via WhatsApp */
-  const handleSendBasic = () => {
+  /** Sends profile details via WhatsApp */
+  const handleSend = (type: "basic" | "full") => {
     // No user selected
     if (!selectedUser) return;
+
+    // Normalize gender and pick the opposite user
+    const isGroom = selectedUser.gender?.toLowerCase() === "groom";
+    const receiverUser = isGroom
+      ? femaleProfiles[selectedFemaleIndex]
+      : maleProfiles[selectedMaleIndex];
+
+    // Build message
     const msg = buildPartialWhatsAppMessage(selectedUser, {
-      include: [
-        "code_no",
-        "name",
-        "gender",
-        "date_of_birth",
-        "age",
-        "height",
-        "working_or_own_venture",
-        "designation",
-        "employer",
-        "working_location",
-        "mob1",
-      ],
-      title: "Candidate Snapshot",
+      include:
+        type === "full"
+          ? [
+              "code_no",
+              "name",
+              "gender",
+              "date_of_birth",
+              "age",
+              "height",
+              "working_or_own_venture",
+              "designation",
+              "employer",
+              "working_location",
+              "mob1",
+              "photo_1",
+              "photo_2",
+              "photo_3",
+            ]
+          : [
+              "code_no",
+              "name",
+              "gender",
+              "date_of_birth",
+              "age",
+              "height",
+              "working_or_own_venture",
+              "designation",
+              "employer",
+              "working_location",
+              "mob1",
+            ],
+      title: `WE FORWARD HEREWITH DETAILS FOR A POSSIBLE MATCH FOR ${receiverUser.name} KINDLY GO THROUGH AND CONSIDER SUITABILITY AND DO CONTACT US IF YOU REQUIRE MORE DETAILS`,
     });
 
-    // Determine recipient
-    const recipientNumber =
-      selectedUser.gender?.toLowerCase() === "groom"
-        ? femaleProfiles[selectedFemaleIndex]?.mob1
-        : maleProfiles[selectedMaleIndex]?.mob1;
-
     // Send message to opposite party
-    if (recipientNumber) openWhatsApp(msg, recipientNumber);
+    openWhatsApp(msg, receiverUser.mob1);
 
-    closeSendPopup();
-  };
-
-  /** Sends full profile details via WhatsApp */
-  const handleSendFull = () => {
-    // No user selected
-    if (!selectedUser) return;
-    const msg = buildFullWhatsAppMessage(selectedUser);
-
-    // Determine recipient
-    const recipientNumber =
-      selectedUser.gender?.toLowerCase() === "groom"
-        ? femaleProfiles[selectedFemaleIndex]?.mob1
-        : maleProfiles[selectedMaleIndex]?.mob1;
-
-    // Send message to opposite party
-    if (recipientNumber) openWhatsApp(msg, recipientNumber);
-
-    // Close popup after sending
+    // Close popup
     closeSendPopup();
   };
 
@@ -243,14 +246,14 @@ const HomeScreen: React.FC = () => {
         text="Loading matrimonial profiles..."
       />
 
-      <div className="bg-slate-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-slate-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-slate-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
+      <div className="bg-n-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-n-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-n-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
         {/* Popup that comes on Send Message */}
         {selectedUser && (
           <SendMessagePopup
             isVisible={sendMessageVisible}
             onClose={closeSendPopup}
-            sendBasicDetails={handleSendBasic}
-            sendFullDetails={handleSendFull}
+            sendBasicDetails={() => handleSend("basic")}
+            sendFullDetails={() => handleSend("full")}
           />
         )}
 
@@ -271,7 +274,7 @@ const HomeScreen: React.FC = () => {
         {/* Main Content Section */}
         <div className="flex">
           {/* Boys Profile Image Wrapper */}
-          <div className="w-116 flex flex-col items-center gap-4 px-5 py-8 ">
+          <div className="w-116 flex flex-col items-center gap-4 px-5 py-7 ">
             {/* Profile Image Slider */}
             {maleProfiles[selectedMaleIndex] && (
               <PhotoSlider
@@ -283,7 +286,7 @@ const HomeScreen: React.FC = () => {
 
             {/* Button */}
             <Button
-              className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
+              className="bg-primary-500 hover:bg-primary-600 text-n-800 w-full h-18 text-base font-medium cursor-pointer"
               onClick={() => {
                 if (femaleProfiles[selectedFemaleIndex])
                   initSendMessage(femaleProfiles[selectedFemaleIndex]);
@@ -295,7 +298,7 @@ const HomeScreen: React.FC = () => {
           </div>
 
           {/* Middle Content Section */}
-          <div className="w-2/3 flex flex-col py-8">
+          <div className="w-2/3 flex flex-col py-7">
             {/* Box 1  */}
             <div className="interactive-card ">
               {/* Boy Title */}
@@ -303,10 +306,10 @@ const HomeScreen: React.FC = () => {
                 <span className="text-3xl font-bold text-n-900">
                   {maleProfiles[selectedMaleIndex]?.name}
                 </span>
-                <span className="size-3 bg-yellow-500 rounded-full"></span>
+                <span className="size-3 bg-primary-500 rounded-full"></span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="size-3 bg-yellow-500 rounded-full"></span>
+                <span className="size-3 bg-primary-500 rounded-full"></span>
                 <span className="text-3xl font-bold text-n-900">
                   {femaleProfiles[selectedFemaleIndex]?.name}
                 </span>
@@ -344,11 +347,13 @@ const HomeScreen: React.FC = () => {
                       <span className="text-sm font-normal text-n-900">
                         {maleProfiles[selectedMaleIndex]?.birth_day}
                       </span>
-                      <div className="flex justify-start items-start"></div>
+                      {/* Separator */}
+                      <div className="bg-n-400 h-2.5 w-px"></div>
                       <span className="text-sm font-normal text-n-900">
                         {maleProfiles[selectedMaleIndex]?.birth_time}
                       </span>
-                      <div className="flex justify-start items-start"></div>
+                      {/* Separator */}
+                      <div className="bg-n-400 h-2.5 w-px"></div>
                       <span className="text-sm font-normal text-n-900">
                         {maleProfiles[selectedMaleIndex]?.birth_place}
                       </span>
@@ -373,11 +378,13 @@ const HomeScreen: React.FC = () => {
                       <span className="text-sm font-normal text-n-900">
                         {femaleProfiles[selectedFemaleIndex]?.birth_day}
                       </span>
-                      <div className="flex justify-start items-start"></div>
+                      {/* Separator */}
+                      <div className="bg-n-400 h-2.5 w-px"></div>
                       <span className="text-sm font-normal text-n-900">
                         {femaleProfiles[selectedFemaleIndex]?.birth_time}
                       </span>
-                      <div className="flex justify-start items-start"></div>
+                      {/* Separator */}
+                      <div className="bg-n-400 h-2.5 w-px"></div>
                       <span className="text-sm font-normal text-n-900">
                         {femaleProfiles[selectedFemaleIndex]?.birth_place}
                       </span>
@@ -664,6 +671,8 @@ const HomeScreen: React.FC = () => {
                         {maleProfiles[selectedMaleIndex]?.father_bari}
                       </span>
                     </span>
+                    {/* Separator */}
+                    <div className="bg-n-400 h-2.5 w-px"></div>
                     <span className="text-lg font-normal text-n-600">
                       Mother:{" "}
                       <span className="font-medium text-n-900">
@@ -683,10 +692,12 @@ const HomeScreen: React.FC = () => {
                   <div className="flex gap-2.5 justify-center items-center">
                     <span className="text-lg font-normal text-n-600">
                       Father:{" "}
-                      <span className="text-lg font-normal text-n-600">
+                      <span className="font-medium text-n-900">
                         {femaleProfiles[selectedFemaleIndex]?.father_bari}
                       </span>
                     </span>
+                    {/* Separator */}
+                    <div className="bg-n-400 h-2.5 w-px"></div>
                     <span className="text-lg font-normal text-n-600">
                       Mother:{" "}
                       <span className="font-medium text-n-900">
@@ -708,7 +719,7 @@ const HomeScreen: React.FC = () => {
           </div>
 
           {/* GIRLS PHOTO SIDE */}
-          <div className="w-116 flex flex-col items-center gap-4 px-5 py-8">
+          <div className="w-116 flex flex-col items-center gap-4 px-5 py-7">
             {femaleProfiles[selectedFemaleIndex] && (
               <PhotoSlider
                 profile={femaleProfiles[selectedFemaleIndex]}
@@ -719,7 +730,7 @@ const HomeScreen: React.FC = () => {
 
             {/* Button */}
             <Button
-              className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 w-full h-18 text-base font-medium cursor-pointer"
+              className="bg-primary-500 hover:bg-primary-600 text-n-800 w-full h-18 text-base font-medium cursor-pointer"
               onClick={() => {
                 if (maleProfiles[selectedMaleIndex])
                   initSendMessage(maleProfiles[selectedMaleIndex]);
