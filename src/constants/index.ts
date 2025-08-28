@@ -37,5 +37,7 @@ export const columnMap: Record<string, string> = {
   AE: "photo_1",
   AF: "photo_2",
   AG: "photo_3",
-  AH: "is_active", // last column
+  AH: "willing_to_relocate",
+  AI: "billawar_member",
+  AJ: "member_phone_number",
 };

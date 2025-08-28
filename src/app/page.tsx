@@ -208,7 +208,7 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     // Fetch data
     loadAndProcessData();
-  }, [loadAndProcessData, selectedUser]);
+  }, [loadAndProcessData]);
 
   // Recalculate rating on every profile change
   useEffect(() => {
@@ -250,11 +250,11 @@ const HomeScreen: React.FC = () => {
           isLoading={false}
           text="Loading matrimonial profiles..."
         />
-        <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-8">
-          <span className="text-2xl font-semibold text-n-900">
+        <div className="min-h-screen flex flex-col items-center justify-center p-8">
+          <span className="text-2xl font-semibold text-n-900 mb-1">
             No profiles available
           </span>
-          <span className="text-n-600">
+          <span className="text-n-600 mb-3">
             Please check back later or try reloading.
           </span>
           <Button
@@ -449,7 +449,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-left">
                 <LabelValueBlock
                   label={"Height"}
-                  value={maleProfiles[selectedMaleIndex]?.height}
+                  value={`${maleProfiles[selectedMaleIndex]?.height} cms`}
                 />
               </div>
 
@@ -457,7 +457,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-right">
                 <LabelValueBlock
                   label={"Height"}
-                  value={femaleProfiles[selectedFemaleIndex]?.height}
+                  value={`${femaleProfiles[selectedFemaleIndex]?.height} cms`}
                   align="right"
                 />
               </div>
@@ -752,6 +752,70 @@ const HomeScreen: React.FC = () => {
                   <span className="yes-match-reason">Different</span>
                 </>
               )}
+            </div>
+
+            {/* WILLING TO RELOCATE */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Willing to Relocate"}
+                  value={maleProfiles[selectedMaleIndex]?.willing_to_relocate}
+                />
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Willing to Relocate"}
+                  value={
+                    femaleProfiles[selectedFemaleIndex]?.willing_to_relocate
+                  }
+                  align="right"
+                />
+              </div>
+            </div>
+
+            {/* BILLAWAR PARENT / MEMBER */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Billawar Parent / Member"}
+                  value={maleProfiles[selectedMaleIndex]?.billawar_member}
+                />
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Billawar Parent / Member"}
+                  value={femaleProfiles[selectedFemaleIndex]?.billawar_member}
+                  align="right"
+                />
+              </div>
+            </div>
+
+            {/* MEMBER NUMBER */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Member Number"}
+                  value={maleProfiles[selectedMaleIndex]?.member_phone_number}
+                />
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Member Number"}
+                  value={
+                    femaleProfiles[selectedFemaleIndex]?.member_phone_number
+                  }
+                  align="right"
+                />
+              </div>
             </div>
           </div>
 
