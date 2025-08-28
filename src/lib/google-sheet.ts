@@ -105,8 +105,8 @@ function normalizePhoto(url?: string) {
 function parseSheetRows(json: any): SheetRow[] {
   const colLetters = Object.keys(columnMap);
 
-  return json.table.rows.map((row: any) =>
-    row.c.reduce((acc: SheetRow, cell: any, i: number) => {
+  return json.table.rows.map((row: any) => {
+    const parsedRow = row.c.reduce((acc: SheetRow, cell: any, i: number) => {
       const colLetter = colLetters[i];
       const key = columnMap[colLetter];
       const value = cell?.v ?? "-";
@@ -145,8 +145,14 @@ function parseSheetRows(json: any): SheetRow[] {
       // Default case for all other fields
       acc[key] = value;
       return acc;
-    }, {})
-  );
+    }, {} as SheetRow);
+
+    // Always set is_active from the sheet's last column, even if not mapped
+    const lastCellValue = row.c?.[row.c.length - 1]?.v ?? "-";
+    parsedRow.is_active = String(lastCellValue);
+
+    return parsedRow;
+  });
 }
 
 /**
@@ -166,9 +172,13 @@ function formatINR(value: string | number): string {
  */
 function filterActiveRows(rows: SheetRow[]): SheetRow[] {
   return rows.filter((row) => {
-    const isActiveKey = columnMap["AH"]; // last column in your sheet
-    const isActiveValue = row[isActiveKey]?.toString().toLowerCase().trim();
-    return isActiveValue === "yes";
+    const isActiveValue = row["is_active"]?.toString().toLowerCase().trim();
+
+    return (
+      isActiveValue === "yes" ||
+      isActiveValue === "true" ||
+      isActiveValue === "1"
+    );
   });
 }
 
@@ -180,5 +190,6 @@ export async function fetchSheetData(sheetUrl: string): Promise<SheetRow[]> {
   const rawJson = await fetchRawSheetJson(sheetUrl); // Step 1: Fetch + clean
   const allRows = parseSheetRows(rawJson); // Step 2: Parse rows
   const activeRows = filterActiveRows(allRows); // Step 3: Filter
+
   return activeRows;
 }

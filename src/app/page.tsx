@@ -28,11 +28,9 @@ import {
 // OTHERS //
 import { fetchSheetData } from "@/lib/google-sheet";
 import {
-  buildFullWhatsAppMessage,
   buildPartialWhatsAppMessage,
   buildWebWhatsAppLink,
 } from "@/lib/whatsapp";
-import { PrivateKeyInput } from "crypto";
 
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
@@ -153,9 +151,13 @@ const HomeScreen: React.FC = () => {
       const gender =
         profile.gender?.toLowerCase() || profile.sex?.toLowerCase();
 
-      if (gender === "groom") {
+      if (gender === "groom" || gender === "boy" || gender === "male") {
         males.push(profile);
-      } else if (gender === "bride") {
+      } else if (
+        gender === "bride" ||
+        gender === "female" ||
+        gender === "girl"
+      ) {
         females.push(profile);
       }
     });
@@ -166,9 +168,11 @@ const HomeScreen: React.FC = () => {
 
   /** Fetches data from Google Sheet and processes it into male/female lists */
   const loadAndProcessData = useCallback(async () => {
+    setLoading(true);
     try {
       // Fetch sheet data
       const rawProfiles = await fetchSheetData(SHEET_URL);
+
       // Split into groups
       const { males, females } = separateProfilesByGender(rawProfiles);
       // Store male profiles
@@ -237,6 +241,39 @@ const HomeScreen: React.FC = () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [showMatchLines]);
+
+  // Graceful empty state when no profiles are available
+  if (!loading && maleProfiles.length === 0 && femaleProfiles.length === 0) {
+    return (
+      <>
+        <FullPageLoader
+          isLoading={false}
+          text="Loading matrimonial profiles..."
+        />
+        <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-8">
+          <span className="text-2xl font-semibold text-n-900">
+            No profiles available
+          </span>
+          <span className="text-n-600">
+            Please check back later or try reloading.
+          </span>
+          <Button
+            className="bg-primary-500 hover:bg-primary-600 text-n-800"
+            onClick={loadAndProcessData}
+          >
+            Reload data
+          </Button>
+        </div>
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          isVisible={toast.isVisible}
+          onClose={closeToast}
+          duration={2000}
+        />
+      </>
+    );
+  }
 
   return (
     <>
