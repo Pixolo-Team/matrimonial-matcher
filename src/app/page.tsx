@@ -246,10 +246,6 @@ const HomeScreen: React.FC = () => {
   if (!loading && maleProfiles.length === 0 && femaleProfiles.length === 0) {
     return (
       <>
-        <FullPageLoader
-          isLoading={false}
-          text="Loading matrimonial profiles..."
-        />
         <div className="min-h-screen flex flex-col items-center justify-center p-8">
           <span className="text-2xl font-semibold text-n-900 mb-1">
             No profiles available
@@ -802,7 +798,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-left">
                 <LabelValueBlock
                   label={"Member Number"}
-                  value={maleProfiles[selectedMaleIndex]?.member_phone_number}
+                  value={maleProfiles[selectedMaleIndex]?.member_number}
                 />
               </div>
 
@@ -810,9 +806,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-right">
                 <LabelValueBlock
                   label={"Member Number"}
-                  value={
-                    femaleProfiles[selectedFemaleIndex]?.member_phone_number
-                  }
+                  value={femaleProfiles[selectedFemaleIndex]?.member_number}
                   align="right"
                 />
               </div>

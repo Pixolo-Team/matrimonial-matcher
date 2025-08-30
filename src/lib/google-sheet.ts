@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { columnMap } from "@/constants";
 import {
   calculateAge,
   formatDateLong,
@@ -8,6 +7,7 @@ import {
   parseGvizDate,
   toDriveDirectView,
 } from "./util";
+import { fetchSheetColumns, SheetColumns } from "@/services/sheet-columns";
 
 /**
  * Represents a row from the Google Sheet as a key-value pair,
@@ -45,64 +45,7 @@ function normalizePhoto(url?: string) {
  * Converts Google's table format to an array of clean objects.
  * Each object represents a row, with column labels as keys.
  */
-// function parseSheetRows(json: any): SheetRow[] {
-//   const colLetters = Object.keys(columnMap);
-
-//   return json.table.rows.map((row: any) =>
-//     row.c.reduce((acc: SheetRow, cell: any, i: number) => {
-//       const colLetter = colLetters[i];
-//       const key = columnMap[colLetter];
-//       const value = cell?.v ?? "-";
-
-//       // Special handling for DOB
-//       if (key === "date_of_birth") {
-//         const dateObj = parseGvizDate(value);
-//         const formattedDate = formatDateLong(dateObj); // "15 March 2001"
-//         acc[key] = formattedDate;
-
-//         // Also set computed age here
-//         acc.age = calculateAge(dateObj ?? "");
-//         return acc;
-//       }
-
-//       // Special handling for Salary PM
-//       if (key === "salary_pm") {
-//         acc[key] = formatINR(value);
-//         return acc;
-//       }
-
-//       // Special handling for Birth Time
-//       if (key === "birth_time") {
-//         const timeObj = parseGvizDate(value);
-//         acc[key] = formatTime12h(timeObj); // "6:45 AM"
-//         return acc;
-//       }
-
-//       // Special Handling for photos
-//       if (key === "photo_1" || key === "photo_2" || key === "photo_3") {
-//         // If value is - then return empty to avoid ui break
-//         if (value === "-") {
-//           acc[key] = "";
-//         } else {
-//           acc[key] = normalizePhoto(String(value));
-//         }
-//         return acc;
-//       } else {
-//         acc[key] = value;
-//       }
-
-//       // Everything else
-//       acc[key] = value;
-//       return acc;
-//     }, {})
-//   );
-// }
-
-/**
- * Converts Google's table format to an array of clean objects.
- * Each object represents a row, with column labels as keys.
- */
-function parseSheetRows(json: any): SheetRow[] {
+function parseSheetRows(json: any, columnMap: SheetColumns): SheetRow[] {
   const colLetters = Object.keys(columnMap);
 
   return json.table.rows.map((row: any) => {
@@ -142,6 +85,13 @@ function parseSheetRows(json: any): SheetRow[] {
         return acc;
       }
 
+      // Special handling for Height - remove letters like "cm" and extract number
+      if (key === "height") {
+        const match = String(value).match(/^(\d+(?:\.\d+)?)/);
+        acc[key] = match ? match[1] : value;
+        return acc;
+      }
+
       // Default case for all other fields
       acc[key] = value;
       return acc;
@@ -173,7 +123,6 @@ function formatINR(value: string | number): string {
 function filterActiveRows(rows: SheetRow[]): SheetRow[] {
   return rows.filter((row) => {
     const isActiveValue = row["is_active"]?.toString().toLowerCase().trim();
-
     return (
       isActiveValue === "yes" ||
       isActiveValue === "true" ||
@@ -187,9 +136,22 @@ function filterActiveRows(rows: SheetRow[]): SheetRow[] {
  * Handles cleaning, parsing, and filtering steps.
  */
 export async function fetchSheetData(sheetUrl: string): Promise<SheetRow[]> {
-  const rawJson = await fetchRawSheetJson(sheetUrl); // Step 1: Fetch + clean
-  const allRows = parseSheetRows(rawJson); // Step 2: Parse rows
-  const activeRows = filterActiveRows(allRows); // Step 3: Filter
+  try {
+    // Fetch column mapping first
+    const columnMap = await fetchSheetColumns();
 
-  return activeRows;
+    // Fetch sheet data
+    const rawJson = await fetchRawSheetJson(sheetUrl);
+
+    // Parse rows using the fetched columnMap
+    const allRows = parseSheetRows(rawJson, columnMap);
+
+    // Filter active rows
+    const activeRows = filterActiveRows(allRows);
+
+    return activeRows;
+  } catch (error) {
+    console.error("Error in fetchSheetData:", error);
+    throw error;
+  }
 }

@@ -39,5 +39,8 @@ export const columnMap: Record<string, string> = {
   AG: "photo_3",
   AH: "willing_to_relocate",
   AI: "billawar_member",
-  AJ: "member_phone_number",
+  AJ: "member_number",
 };
+
+export const SHEET_COLUMNS_URL =
+  "https://pixoloproductions.com/api/billawar/sheet-columns.json";
