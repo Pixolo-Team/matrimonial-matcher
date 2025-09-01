@@ -28,11 +28,9 @@ import {
 // OTHERS //
 import { fetchSheetData } from "@/lib/google-sheet";
 import {
-  buildFullWhatsAppMessage,
   buildPartialWhatsAppMessage,
   buildWebWhatsAppLink,
 } from "@/lib/whatsapp";
-import { PrivateKeyInput } from "crypto";
 
 // SVG's //
 import ShareIcon from "@/../public/icons/share.svg";
@@ -153,9 +151,13 @@ const HomeScreen: React.FC = () => {
       const gender =
         profile.gender?.toLowerCase() || profile.sex?.toLowerCase();
 
-      if (gender === "groom") {
+      if (gender === "groom" || gender === "boy" || gender === "male") {
         males.push(profile);
-      } else if (gender === "bride") {
+      } else if (
+        gender === "bride" ||
+        gender === "female" ||
+        gender === "girl"
+      ) {
         females.push(profile);
       }
     });
@@ -166,9 +168,11 @@ const HomeScreen: React.FC = () => {
 
   /** Fetches data from Google Sheet and processes it into male/female lists */
   const loadAndProcessData = useCallback(async () => {
+    setLoading(true);
     try {
       // Fetch sheet data
       const rawProfiles = await fetchSheetData(SHEET_URL);
+
       // Split into groups
       const { males, females } = separateProfilesByGender(rawProfiles);
       // Store male profiles
@@ -204,7 +208,7 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     // Fetch data
     loadAndProcessData();
-  }, [loadAndProcessData, selectedUser]);
+  }, [loadAndProcessData]);
 
   // Recalculate rating on every profile change
   useEffect(() => {
@@ -237,6 +241,35 @@ const HomeScreen: React.FC = () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [showMatchLines]);
+
+  // Graceful empty state when no profiles are available
+  if (!loading && maleProfiles.length === 0 && femaleProfiles.length === 0) {
+    return (
+      <>
+        <div className="min-h-screen flex flex-col items-center justify-center p-8">
+          <span className="text-2xl font-semibold text-n-900 mb-1">
+            No profiles available
+          </span>
+          <span className="text-n-600 mb-3">
+            Please check back later or try reloading.
+          </span>
+          <Button
+            className="bg-primary-500 hover:bg-primary-600 text-n-800"
+            onClick={loadAndProcessData}
+          >
+            Reload data
+          </Button>
+        </div>
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          isVisible={toast.isVisible}
+          onClose={closeToast}
+          duration={2000}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -412,7 +445,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-left">
                 <LabelValueBlock
                   label={"Height"}
-                  value={maleProfiles[selectedMaleIndex]?.height}
+                  value={`${maleProfiles[selectedMaleIndex]?.height} cms`}
                 />
               </div>
 
@@ -420,7 +453,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-right">
                 <LabelValueBlock
                   label={"Height"}
-                  value={femaleProfiles[selectedFemaleIndex]?.height}
+                  value={`${femaleProfiles[selectedFemaleIndex]?.height} cms`}
                   align="right"
                 />
               </div>
@@ -715,6 +748,68 @@ const HomeScreen: React.FC = () => {
                   <span className="yes-match-reason">Different</span>
                 </>
               )}
+            </div>
+
+            {/* WILLING TO RELOCATE */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Willing to Relocate"}
+                  value={maleProfiles[selectedMaleIndex]?.willing_to_relocate}
+                />
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Willing to Relocate"}
+                  value={
+                    femaleProfiles[selectedFemaleIndex]?.willing_to_relocate
+                  }
+                  align="right"
+                />
+              </div>
+            </div>
+
+            {/* BILLAWAR PARENT / MEMBER */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Billawar Parent / Member"}
+                  value={maleProfiles[selectedMaleIndex]?.billawar_member}
+                />
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Billawar Parent / Member"}
+                  value={femaleProfiles[selectedFemaleIndex]?.billawar_member}
+                  align="right"
+                />
+              </div>
+            </div>
+
+            {/* MEMBER NUMBER */}
+            <div className="interactive-card">
+              {/* Boy */}
+              <div className="label-value-container-left">
+                <LabelValueBlock
+                  label={"Member Number"}
+                  value={maleProfiles[selectedMaleIndex]?.member_number}
+                />
+              </div>
+
+              {/* Girl */}
+              <div className="label-value-container-right">
+                <LabelValueBlock
+                  label={"Member Number"}
+                  value={femaleProfiles[selectedFemaleIndex]?.member_number}
+                  align="right"
+                />
+              </div>
             </div>
           </div>
 

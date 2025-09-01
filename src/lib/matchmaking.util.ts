@@ -4,8 +4,16 @@ export type Profile = Record<string, string>;
 
 // Convert to number safely
 type Numeric = number | null;
-function parseNumber(value: string): Numeric {
-  const n = parseFloat(value);
+function parseNumber(value: string | number): Numeric {
+  if (value === undefined || value === null) return null;
+  const text = String(value);
+
+  // Extract the first number (supports formats like "1,20,000", "30000", "120000.50")
+  const match = text.match(/(?:\d{1,3}(?:,\d{2,3})+|\d+)(?:\.\d+)?/);
+  if (!match) return null;
+
+  const normalized = match[0].replace(/,/g, "");
+  const n = parseFloat(normalized);
   return isNaN(n) ? null : n;
 }
 
@@ -41,6 +49,7 @@ export function calculateCompatibilityRating(
   // Compare Salaries
   const boySalary = parseNumber(boy.salary_pm);
   const girlSalary = parseNumber(girl.salary_pm);
+
   // Increment the score if boy's salary is greater than girl's salary
   if (boySalary !== null && girlSalary !== null && boySalary > girlSalary)
     score++;
@@ -92,8 +101,12 @@ export function checkMatch(
   switch (field) {
     case "height":
     case "salary_pm":
-    case "age":
-      return maleValue >= femaleValue ? "yes-match" : "no-match";
+    case "age": {
+      const maleNum = parseNumber(maleValue);
+      const femaleNum = parseNumber(femaleValue);
+      if (maleNum === null || femaleNum === null) return "no-match";
+      return maleNum >= femaleNum ? "yes-match" : "no-match";
+    }
 
     case "father_bari":
     case "mother_bari": // Example: must be different
