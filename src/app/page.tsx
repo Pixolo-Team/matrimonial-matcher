@@ -93,7 +93,11 @@ const HomeScreen: React.FC = () => {
     if (!selectedUser) return;
 
     // Normalize gender and pick the opposite user
-    const isGroom = selectedUser.gender?.toLowerCase() === "groom";
+    const isGroom =
+      selectedUser.gender?.toLowerCase() === "groom" ||
+      selectedUser.gender?.toLowerCase() === "male" ||
+      selectedUser.gender?.toLowerCase() === "boy";
+
     const receiverUser = isGroom
       ? femaleProfiles[selectedFemaleIndex]
       : maleProfiles[selectedMaleIndex];
@@ -103,7 +107,6 @@ const HomeScreen: React.FC = () => {
       include:
         type === "full"
           ? [
-              "code_no",
               "name",
               "gender",
               "date_of_birth",
@@ -113,13 +116,12 @@ const HomeScreen: React.FC = () => {
               "designation",
               "employer",
               "working_location",
-              "mob1",
+
               "photo_1",
               "photo_2",
               "photo_3",
             ]
           : [
-              "code_no",
               "name",
               "gender",
               "date_of_birth",
@@ -129,7 +131,6 @@ const HomeScreen: React.FC = () => {
               "designation",
               "employer",
               "working_location",
-              "mob1",
             ],
       title: `WE FORWARD HEREWITH DETAILS FOR A POSSIBLE MATCH FOR ${receiverUser.name} KINDLY GO THROUGH AND CONSIDER SUITABILITY AND DO CONTACT US IF YOU REQUIRE MORE DETAILS`,
     });
@@ -696,7 +697,7 @@ const HomeScreen: React.FC = () => {
             >
               {/* Boy */}
               <div className="label-value-container-left">
-                <LabelValueBlock label={"Any other details / Conditions"}>
+                <LabelValueBlock label={"Bari"}>
                   <div className="flex gap-2.5 justify-center items-center">
                     <span className="text-lg font-normal text-n-600">
                       Father:{" "}
@@ -718,10 +719,7 @@ const HomeScreen: React.FC = () => {
 
               {/* Girl */}
               <div className="label-value-container-right">
-                <LabelValueBlock
-                  label={"Any other details / Conditions"}
-                  align="right"
-                >
+                <LabelValueBlock label={"Bari"} align="right">
                   <div className="flex gap-2.5 justify-center items-center">
                     <span className="text-lg font-normal text-n-600">
                       Father:{" "}
