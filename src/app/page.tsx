@@ -96,7 +96,8 @@ const HomeScreen: React.FC = () => {
     const isGroom =
       selectedUser.gender?.toLowerCase() === "groom" ||
       selectedUser.gender?.toLowerCase() === "male" ||
-      selectedUser.gender?.toLowerCase() === "boy";
+      selectedUser.gender?.toLowerCase() === "boy" ||
+      selectedUser.gender?.toLowerCase() === "groom (boy)";
 
     const receiverUser = isGroom
       ? femaleProfiles[selectedFemaleIndex]
@@ -116,7 +117,6 @@ const HomeScreen: React.FC = () => {
               "designation",
               "employer",
               "working_location",
-
               "photo_1",
               "photo_2",
               "photo_3",
