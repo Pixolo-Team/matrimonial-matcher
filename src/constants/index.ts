@@ -40,6 +40,10 @@ export const columnMap: Record<string, string> = {
   AH: "willing_to_relocate",
   AI: "billawar_member",
   AJ: "member_number",
+  AK: "education_status",
+  AL: "name_of_employer",
+  AM: "address_for_communication",
+  AN: "email_address",
 };
 
 export const SHEET_COLUMNS_URL =
