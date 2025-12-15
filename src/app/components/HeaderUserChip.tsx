@@ -1,6 +1,8 @@
+// REACT //
+import { useState } from "react";
+
 // COMPONENTS //
 import Image from "next/image";
-import { useState } from "react";
 
 /* Header User chip component */
 const HeaderUserChip: React.FC<{
@@ -11,6 +13,8 @@ const HeaderUserChip: React.FC<{
   onClick: () => void;
 }> = ({ src, name, age, isActive = false, onClick }) => {
   const fallbackSrc = "/default-user.jpg";
+
+  // Define States
   const [imgSrc, setImgSrc] = useState(src || fallbackSrc);
 
   return (
