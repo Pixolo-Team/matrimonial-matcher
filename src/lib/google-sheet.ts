@@ -98,7 +98,7 @@ function parseSheetRows(json: any, columnMap: SheetColumns): SheetRow[] {
     }, {} as SheetRow);
 
     // Always set is_active from the sheet's last column, even if not mapped
-    const lastCellValue = row.c?.[row.c.length - 1]?.v ?? "-";
+    const lastCellValue = row.c?.[40]?.v ?? "-";
     parsedRow.is_active = String(lastCellValue);
 
     return parsedRow;

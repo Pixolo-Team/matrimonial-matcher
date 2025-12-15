@@ -74,7 +74,6 @@ const PhotoSlider: React.FC<PhotoSliderProps> = ({
 
   // Reset to first slide when the profile/images change
   useEffect(() => {
-    
     // Reset index state
     setSelectedIndex(0);
     if (!emblaApi) return;
@@ -122,7 +121,10 @@ const PhotoSlider: React.FC<PhotoSliderProps> = ({
             >
               <div className="relative w-full h-full aspect-[4/6]">
                 <Image
-                  src={imageSrc}
+                  src={
+                    imageSrc ??
+                    "https://drive.google.com/open?id=1Jc6pohgCS-4TGtjdfRhoIdI67JlwCiU-"
+                  }
                   alt={`${alt} ${idx + 1}`}
                   fill
                   className="object-cover"
