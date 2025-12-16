@@ -137,14 +137,18 @@ function buildMessage(
   fields: (keyof Profile)[],
   title?: string
 ) {
+  console.log(profile);
+
   const headerName = profile.name ? `*${esc(profile.name)}*` : "*Profile*";
-  const headerCode = profile.code_no ? ` (${esc(profile.code_no)})` : "";
+  const headerCode = profile.code_no ? profile.code_no : "";
   const header = title ?? `${headerName}${headerCode}`;
 
   const body = fields
     .map((k) => line(LABELS[k], profile[k]))
     .filter(Boolean)
     .join("\n");
+
+  console.log(body);
 
   // Nice WhatsApp spacing + end note
   return `${header}\n\n${body}`.trim();

@@ -95,7 +95,7 @@ export function checkMatch(
   field: string,
   maleValue: number | string,
   femaleValue: number | string
-): "yes-match" | "no-match" {
+): "yes-match" | "no-match" | "same-match" {
   if (!maleValue || !femaleValue) return "no-match"; // Missing data is a fail
 
   switch (field) {
@@ -105,7 +105,8 @@ export function checkMatch(
       const maleNum = parseNumber(maleValue);
       const femaleNum = parseNumber(femaleValue);
       if (maleNum === null || femaleNum === null) return "no-match";
-      return maleNum >= femaleNum ? "yes-match" : "no-match";
+      if (maleNum === femaleNum) return "same-match";
+      return maleNum > femaleNum ? "yes-match" : "no-match";
     }
 
     case "father_bari":

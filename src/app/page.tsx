@@ -428,6 +428,7 @@ const HomeScreen: React.FC = () => {
               </div>
               <span className="no-match-reason">Less than</span>
               <span className="yes-match-reason">More than</span>
+              <span className="same-match-reason">Same</span>
             </div>
 
             {/* HEIGHT */}
@@ -464,6 +465,7 @@ const HomeScreen: React.FC = () => {
                 <>
                   <span className="no-match-reason">Less than</span>
                   <span className="yes-match-reason">More than</span>
+                  <span className="same-match-reason">Same</span>
                 </>
               )}
             </div>
@@ -606,6 +608,7 @@ const HomeScreen: React.FC = () => {
                 <>
                   <span className="no-match-reason">Less than</span>
                   <span className="yes-match-reason">More than</span>
+                  <span className="same-match-reason">Same</span>
                 </>
               )}
             </div>

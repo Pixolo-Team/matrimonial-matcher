@@ -220,6 +220,10 @@
   @apply border-[3px] border-green-500 bg-green-100;
 }
 
+.same-match {
+  @apply border-[3px] border-yellow-500 bg-yellow-100;
+}
+
 @layer components {
   .p-with-before {
     @apply relative; /* Needed so ::before is positioned relative to the P */
@@ -238,6 +242,9 @@
   .yes-match-reason {
     @apply hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-500 px-2 py-1 text-sm text-slate-50;
   }
+  .same-match-reason {
+    @apply hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 px-2 py-1 text-sm text-slate-50;
+  }
 
   
 }
@@ -254,9 +261,14 @@
     @apply block;
   }
 
+  .same-match .same-match-reason {
+    @apply block;
+  }
+
   /* Hide reason divs by default */
   .no-match-reason,
-  .yes-match-reason {
+  .yes-match-reason,
+  .same-match-reason {
     @apply hidden;
   }
 
