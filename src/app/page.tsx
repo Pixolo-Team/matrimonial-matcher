@@ -353,15 +353,15 @@ const HomeScreen: React.FC = () => {
             {/* Box 1  */}
             <div className="interactive-card ">
               {/* Boy Title */}
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-n-900 max-w-[calc(50%-10px)]">
+              <div className="flex items-baseline gap-2 max-w-[calc(45%-10px)]">
+                <span className="text-3xl font-bold text-n-900">
                   {maleProfiles[selectedMaleIndex]?.name}
                 </span>
                 <span className="size-3 bg-primary-500 rounded-full"></span>
               </div>
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 max-w-[calc(45%-10px)]">
                 <span className="size-3 bg-primary-500 rounded-full"></span>
-                <span className="text-2xl font-bold text-n-900 max-w-[calc(50%-10px)]">
+                <span className="text-3xl font-bold text-n-900 ">
                   {femaleProfiles[selectedFemaleIndex]?.name}
                 </span>
               </div>
