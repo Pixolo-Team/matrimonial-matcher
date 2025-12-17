@@ -79,6 +79,23 @@ const HomeScreen: React.FC = () => {
     setToast((prev) => ({ ...prev, isVisible: false }));
   };
 
+  /** Get marriage status text */
+  const getMarriageStatusText = useCallback((profile: Profile | undefined) => {
+    if (!profile) return "-";
+    const isDivorced = profile.is_divorced?.trim().toLowerCase();
+    const isFirstMarriage = profile.is_first_marriage?.trim().toLowerCase();
+
+    if (isDivorced === "yes") return "Divorcee";
+    if (isFirstMarriage === "yes") return "1st Marriage";
+
+    const isDivorcedEmpty = !isDivorced || isDivorced === "-";
+    const isFirstMarriageEmpty = !isFirstMarriage || isFirstMarriage === "-";
+
+    if (isDivorcedEmpty && isFirstMarriageEmpty) return "-";
+
+    return "Married Before";
+  }, []);
+
   /** Opens WhatsApp Web with a message and optional phone number */
   const openWhatsApp = (msg: string, to: string) => {
     // Generate WhatsApp link
@@ -337,14 +354,14 @@ const HomeScreen: React.FC = () => {
             <div className="interactive-card ">
               {/* Boy Title */}
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-n-900">
+                <span className="text-2xl font-bold text-n-900 max-w-[calc(50%-10px)]">
                   {maleProfiles[selectedMaleIndex]?.name}
                 </span>
                 <span className="size-3 bg-primary-500 rounded-full"></span>
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="size-3 bg-primary-500 rounded-full"></span>
-                <span className="text-3xl font-bold text-n-900">
+                <span className="text-2xl font-bold text-n-900 max-w-[calc(50%-10px)]">
                   {femaleProfiles[selectedFemaleIndex]?.name}
                 </span>
               </div>
@@ -633,13 +650,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-left">
                 <LabelValueBlock
                   label={"1st Marriage / Divorcee"}
-                  value={
-                    maleProfiles[selectedMaleIndex]?.is_divorced
-                      ? "Divorcee"
-                      : maleProfiles[selectedMaleIndex]?.is_first_marriage
-                      ? "1st Marriage"
-                      : "Married Before"
-                  }
+                  value={getMarriageStatusText(maleProfiles[selectedMaleIndex])}
                 />
               </div>
 
@@ -647,13 +658,9 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-right">
                 <LabelValueBlock
                   label={"1st Marriage / Divorcee"}
-                  value={
-                    femaleProfiles[selectedFemaleIndex]?.is_divorced
-                      ? "Divorcee"
-                      : femaleProfiles[selectedFemaleIndex]?.is_first_marriage
-                      ? "1st Marriage"
-                      : "Married Before"
-                  }
+                  value={getMarriageStatusText(
+                    femaleProfiles[selectedFemaleIndex]
+                  )}
                   align="right"
                 />
               </div>
