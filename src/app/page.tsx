@@ -166,17 +166,30 @@ const HomeScreen: React.FC = () => {
 
     // Loop over profiles and push gender specific profiles in their respective states
     profiles.forEach((profile) => {
-      const gender =
-        profile.gender?.toLowerCase() || profile.sex?.toLowerCase();
+      const gender = (
+        profile.gender?.toLowerCase() || profile.sex?.toLowerCase() || ""
+      ).trim();
 
-      if (gender === "groom" || gender === "boy" || gender === "male") {
+      if (
+        gender === "groom" ||
+        gender === "boy" ||
+        gender === "male" ||
+        gender.includes("groom") ||
+        gender.includes("boy") ||
+        gender.includes("male")
+      ) {
         males.push(profile);
       } else if (
         gender === "bride" ||
         gender === "female" ||
-        gender === "girl"
+        gender === "girl" ||
+        gender.includes("bride") ||
+        gender.includes("female") ||
+        gender.includes("girl")
       ) {
         females.push(profile);
+      } else {
+        console.warn("[profiles] Unmatched gender value:", profile.gender, profile);
       }
     });
 
@@ -190,9 +203,12 @@ const HomeScreen: React.FC = () => {
     try {
       // Fetch sheet data
       const rawProfiles = await fetchSheetData(SHEET_URL);
+      console.log("[profiles] Usable profile objects:", rawProfiles);
 
       // Split into groups
       const { males, females } = separateProfilesByGender(rawProfiles);
+      console.log("[profiles] Male profiles:", males);
+      console.log("[profiles] Female profiles:", females);
       // Store male profiles
       setMaleProfiles(males);
       // Store female profiles

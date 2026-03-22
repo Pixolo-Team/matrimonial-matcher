@@ -142,12 +142,15 @@ export async function fetchSheetData(sheetUrl: string): Promise<SheetRow[]> {
 
     // Fetch sheet data
     const rawJson = await fetchRawSheetJson(sheetUrl);
+    console.log("[sheet] Raw Google Sheet JSON:", rawJson);
 
     // Parse rows using the fetched columnMap
     const allRows = parseSheetRows(rawJson, columnMap);
+    console.log("[sheet] Parsed row objects:", allRows);
 
     // Filter active rows
     const activeRows = filterActiveRows(allRows);
+    console.log("[sheet] Active row objects:", activeRows);
 
     return activeRows;
   } catch (error) {
