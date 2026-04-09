@@ -6,6 +6,7 @@ import "./globals.css";
 
 // COMPONENTS //
 import localFont from "next/font/local";
+import PasswordGate from "@/app/components/PasswordGate";
 
 // DATA //
 import type { Metadata } from "next";
@@ -90,7 +91,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${neometricFont.className} antialiased`}>
-        {children}
+        <PasswordGate>{children}</PasswordGate>
       </body>
     </html>
   );
