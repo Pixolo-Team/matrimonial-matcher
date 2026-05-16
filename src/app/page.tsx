@@ -386,6 +386,27 @@ const HomeScreen: React.FC = () => {
               <MatchBadge score={compatibilityRating} />
             </div>
 
+            {/* Code Number */}
+            <div className="interactive-card">
+              {/* Boy - Code Number */}
+              <div className="label-value-container-left">
+                <LabelValueBlock label="Code Number">
+                  <span className="text-lg font-medium text-n-900">
+                    {maleProfiles[selectedMaleIndex]?.code_no}
+                  </span>
+                </LabelValueBlock>
+              </div>
+
+              {/* Girl - Code Number */}
+              <div className="label-value-container-right">
+                <LabelValueBlock label="Code Number" align="right">
+                  <span className="text-lg font-medium text-n-900">
+                    {femaleProfiles[selectedFemaleIndex]?.code_no}
+                  </span>
+                </LabelValueBlock>
+              </div>
+            </div>
+
             {/* DOB */}
             <div
               className={`interactive-card ${
