@@ -104,7 +104,6 @@ const FULL_FIELDS: (keyof Profile)[] = [
   "mob2",
   "email",
   "status",
-  "is_first_marriage",
   "any_other_details",
   // Put photos at end so WhatsApp preview shows links neatly
   "photo_1",
