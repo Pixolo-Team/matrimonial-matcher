@@ -101,6 +101,11 @@ export function checkMatch(
   switch (field) {
     case "height":
     case "salary_pm":
+      const maleNum = parseNumber(maleValue);
+      const femaleNum = parseNumber(femaleValue);
+      if (maleNum === null || femaleNum === null) return "no-match";
+      if (maleNum === femaleNum) return "same-match";
+      return maleNum > femaleNum ? "yes-match" : "no-match";
     case "age": {
       const maleNum = parseNumber(maleValue);
       const femaleNum = parseNumber(femaleValue);
