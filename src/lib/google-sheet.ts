@@ -49,10 +49,18 @@ function parseSheetRows(json: any, columnMap: SheetColumns): SheetRow[] {
   const colLetters = Object.keys(columnMap);
 
   return json.table.rows.map((row: any) => {
+    const baseRow = colLetters.reduce((acc: SheetRow, colLetter) => {
+      const key = columnMap[colLetter];
+      if (key) acc[key] = "-";
+      return acc;
+    }, {} as SheetRow);
+
     const parsedRow = row.c.reduce((acc: SheetRow, cell: any, i: number) => {
       const colLetter = colLetters[i];
       const key = columnMap[colLetter];
       const value = cell?.v ?? "-";
+
+      if (!key) return acc;
 
       // Special handling for DOB
       if (key === "date_of_birth") {
@@ -95,7 +103,7 @@ function parseSheetRows(json: any, columnMap: SheetColumns): SheetRow[] {
       // Default case for all other fields
       acc[key] = value;
       return acc;
-    }, {} as SheetRow);
+    }, baseRow);
 
     // Always set is_active from the sheet's last column, even if not mapped
     const lastCellValue = row.c?.[row.c.length - 1]?.v ?? "-";

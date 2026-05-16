@@ -30,7 +30,7 @@ export function toggleMatchLines(currentState: boolean): boolean {
  */
 export function calculateCompatibilityRating(
   boy: Profile,
-  girl: Profile
+  girl: Profile,
 ): number {
   if (!boy && !girl) return 0;
   // Initialize score
@@ -69,8 +69,8 @@ export function calculateCompatibilityRating(
     score++;
 
   // Check if both are divorced, and increment if they are
-  const boyDiv = boy.is_divorced?.trim().toLowerCase() === "yes";
-  const girlDiv = girl.is_divorced?.trim().toLowerCase() === "yes";
+  const boyDiv = boy.status?.trim().toLowerCase() === "yes";
+  const girlDiv = girl.status?.trim().toLowerCase() === "yes";
   if ((boyDiv && girlDiv) || (!boyDiv && !girlDiv)) score++;
 
   // Compare both heights and increment the score if boy's height is greater than the girl's
@@ -94,7 +94,7 @@ function parseHeight(height: string): Numeric {
 export function checkMatch(
   field: string,
   maleValue: number | string,
-  femaleValue: number | string
+  femaleValue: number | string,
 ): "yes-match" | "no-match" | "same-match" {
   if (!maleValue || !femaleValue) return "no-match"; // Missing data is a fail
 
@@ -106,7 +106,11 @@ export function checkMatch(
       const femaleNum = parseNumber(femaleValue);
       if (maleNum === null || femaleNum === null) return "no-match";
       if (maleNum === femaleNum) return "same-match";
-      return maleNum > femaleNum ? "yes-match" : "no-match";
+      return maleNum > femaleNum
+        ? maleNum > femaleNum + 7
+          ? "same-match"
+          : "yes-match"
+        : "no-match";
     }
 
     case "father_bari":

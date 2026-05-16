@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import LabelValueBlock from "@/app/components/LabelValueBlock";
 import SendMessagePopup from "@/app/components/SendMessagePopup";
 import PhotoSlider from "@/app/components/PhotoSlider";
-import MatchBadge from "@/app/components/MatchBadge";
 import MainHeader from "@/app/components/MainHeader";
 import { SectionDivider } from "@/app/components/SectionDivider";
 import { ContactSection } from "@/app/components/ContactSection";
@@ -78,23 +77,6 @@ const HomeScreen: React.FC = () => {
   const closeToast = () => {
     setToast((prev) => ({ ...prev, isVisible: false }));
   };
-
-  /** Get marriage status text */
-  const getMarriageStatusText = useCallback((profile: Profile | undefined) => {
-    if (!profile) return "-";
-    const isDivorced = profile.is_divorced?.trim().toLowerCase();
-    const isFirstMarriage = profile.is_first_marriage?.trim().toLowerCase();
-
-    if (isDivorced === "yes") return "Divorcee";
-    if (isFirstMarriage === "yes") return "1st Marriage";
-
-    const isDivorcedEmpty = !isDivorced || isDivorced === "-";
-    const isFirstMarriageEmpty = !isFirstMarriage || isFirstMarriage === "-";
-
-    if (isDivorcedEmpty && isFirstMarriageEmpty) return "-";
-
-    return "Married Before";
-  }, []);
 
   /** Opens WhatsApp Web with a message and optional phone number */
   const openWhatsApp = (msg: string, to: string) => {
@@ -167,7 +149,9 @@ const HomeScreen: React.FC = () => {
     // Loop over profiles and push gender specific profiles in their respective states
     profiles.forEach((profile) => {
       const gender = (
-        profile.gender?.toLowerCase() || profile.sex?.toLowerCase() || ""
+        profile.gender?.toLowerCase() ||
+        profile.sex?.toLowerCase() ||
+        ""
       ).trim();
 
       if (
@@ -189,13 +173,42 @@ const HomeScreen: React.FC = () => {
       ) {
         females.push(profile);
       } else {
-        console.warn("[profiles] Unmatched gender value:", profile.gender, profile);
+        console.warn(
+          "[profiles] Unmatched gender value:",
+          profile.gender,
+          profile,
+        );
       }
     });
 
     // Return grouped profiles
     return { males, females };
   }
+
+  /** Compare education status using the sheet-defined ranking. */
+  const getEducationStatusMatch = useCallback(
+    (
+      maleEducationStatus?: string,
+      femaleEducationStatus?: string,
+    ): "yes-match" | "no-match" => {
+      if (!maleEducationStatus || !femaleEducationStatus) return "no-match";
+
+      const educationRank: Record<string, number> = {
+        "professional qualified": 1,
+        "post graduate": 2,
+        graduate: 3,
+        "under graduate": 4,
+      };
+
+      const maleRank = educationRank[maleEducationStatus.trim().toLowerCase()];
+      const femaleRank =
+        educationRank[femaleEducationStatus.trim().toLowerCase()];
+
+      if (!maleRank || !femaleRank) return "no-match";
+      return maleRank <= femaleRank ? "yes-match" : "no-match";
+    },
+    [],
+  );
 
   /** Fetches data from Google Sheet and processes it into male/female lists */
   const loadAndProcessData = useCallback(async () => {
@@ -230,8 +243,8 @@ const HomeScreen: React.FC = () => {
         // Selected male profile
         maleProfiles[selectedMaleIndex],
         // Selected female profile
-        femaleProfiles[selectedFemaleIndex]
-      )
+        femaleProfiles[selectedFemaleIndex],
+      ),
     );
 
     // Update Rating
@@ -383,7 +396,26 @@ const HomeScreen: React.FC = () => {
               </div>
 
               {/* Match Score Badge Component */}
-              <MatchBadge score={compatibilityRating} />
+              {/* <MatchBadge score={compatibilityRating} /> */}
+            </div>
+
+            <div className="interactive-card">
+              <div className="label-value-container-left">
+                {/* Boy - Code Number */}
+                <LabelValueBlock
+                  label="Code Number"
+                  value={maleProfiles[selectedMaleIndex]?.code_no}
+                />
+              </div>
+
+              <div className="label-value-container-right">
+                {/* Girl - Code Number */}
+                <LabelValueBlock
+                  label="Code Number"
+                  value={femaleProfiles[selectedFemaleIndex]?.code_no}
+                  align="right"
+                />
+              </div>
             </div>
 
             {/* DOB */}
@@ -393,75 +425,76 @@ const HomeScreen: React.FC = () => {
                   ? checkMatch(
                       "age",
                       maleProfiles[selectedMaleIndex]?.age,
-                      femaleProfiles[selectedFemaleIndex]?.age
+                      femaleProfiles[selectedFemaleIndex]?.age,
                     )
                   : ""
               }`}
             >
               {/* Boy - DOB */}
               <div className="label-value-container-left">
-                <LabelValueBlock label="Date of Birth">
-                  <div className="flex flex-col  justify-start items-start">
-                    <div className="flex gap-2 justify-center items-center">
-                      <span className="text-lg font-medium text-n-900">
-                        {maleProfiles[selectedMaleIndex]?.date_of_birth}
-                      </span>
-                      <span className="text-xl font-medium text-n-600">
-                        ({maleProfiles[selectedMaleIndex]?.age})
-                      </span>
+                <div className="flex flex-col gap-3">
+                  <LabelValueBlock label="Date of Birth">
+                    <div className="flex flex-col  justify-start items-start">
+                      <div className="flex gap-2 justify-center items-center">
+                        <span className="text-lg font-medium text-n-900">
+                          {maleProfiles[selectedMaleIndex]?.date_of_birth}
+                        </span>
+                        <span className="text-xl font-medium text-n-600">
+                          ({maleProfiles[selectedMaleIndex]?.age})
+                        </span>
+                      </div>
+                      <div className="flex gap-2.5 justify-start items-center">
+                        <span className="text-sm font-normal text-n-900">
+                          {maleProfiles[selectedMaleIndex]?.birth_day}
+                        </span>
+                        {/* Separator */}
+                        <div className="bg-n-400 h-2.5 w-px"></div>
+                        <span className="text-sm font-normal text-n-900">
+                          {maleProfiles[selectedMaleIndex]?.birth_time}
+                        </span>
+                        {/* Separator */}
+                        <div className="bg-n-400 h-2.5 w-px"></div>
+                        <span className="text-sm font-normal text-n-900">
+                          {maleProfiles[selectedMaleIndex]?.birth_place}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex gap-2.5 justify-start items-center">
-                      <span className="text-sm font-normal text-n-900">
-                        {maleProfiles[selectedMaleIndex]?.birth_day}
-                      </span>
-                      {/* Separator */}
-                      <div className="bg-n-400 h-2.5 w-px"></div>
-                      <span className="text-sm font-normal text-n-900">
-                        {maleProfiles[selectedMaleIndex]?.birth_time}
-                      </span>
-                      {/* Separator */}
-                      <div className="bg-n-400 h-2.5 w-px"></div>
-                      <span className="text-sm font-normal text-n-900">
-                        {maleProfiles[selectedMaleIndex]?.birth_place}
-                      </span>
-                    </div>
-                  </div>
-                </LabelValueBlock>
+                  </LabelValueBlock>
+                </div>
               </div>
 
               {/* Girl - DOB */}
               <div className="label-value-container-right">
-                <LabelValueBlock label="Date of Birth" align="right">
-                  <div className="flex flex-col  justify-start items-end">
-                    <div className="flex gap-2 justify-center items-center">
-                      <span className="text-lg font-medium text-n-900">
-                        {femaleProfiles[selectedFemaleIndex]?.date_of_birth}
-                      </span>
-                      <span className="text-xl font-medium text-n-600">
-                        ({femaleProfiles[selectedFemaleIndex]?.age})
-                      </span>
+                <div className="flex flex-col gap-3 items-end">
+                  <LabelValueBlock label="Date of Birth" align="right">
+                    <div className="flex flex-col  justify-start items-end">
+                      <div className="flex gap-2 justify-center items-center">
+                        <span className="text-lg font-medium text-n-900">
+                          {femaleProfiles[selectedFemaleIndex]?.date_of_birth}
+                        </span>
+                        <span className="text-xl font-medium text-n-600">
+                          ({femaleProfiles[selectedFemaleIndex]?.age})
+                        </span>
+                      </div>
+                      <div className="flex gap-2.5 justify-start items-center">
+                        <span className="text-sm font-normal text-n-900">
+                          {femaleProfiles[selectedFemaleIndex]?.birth_day}
+                        </span>
+                        {/* Separator */}
+                        <div className="bg-n-400 h-2.5 w-px"></div>
+                        <span className="text-sm font-normal text-n-900">
+                          {femaleProfiles[selectedFemaleIndex]?.birth_time}
+                        </span>
+                        {/* Separator */}
+                        <div className="bg-n-400 h-2.5 w-px"></div>
+                        <span className="text-sm font-normal text-n-900">
+                          {femaleProfiles[selectedFemaleIndex]?.birth_place}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex gap-2.5 justify-start items-center">
-                      <span className="text-sm font-normal text-n-900">
-                        {femaleProfiles[selectedFemaleIndex]?.birth_day}
-                      </span>
-                      {/* Separator */}
-                      <div className="bg-n-400 h-2.5 w-px"></div>
-                      <span className="text-sm font-normal text-n-900">
-                        {femaleProfiles[selectedFemaleIndex]?.birth_time}
-                      </span>
-                      {/* Separator */}
-                      <div className="bg-n-400 h-2.5 w-px"></div>
-                      <span className="text-sm font-normal text-n-900">
-                        {femaleProfiles[selectedFemaleIndex]?.birth_place}
-                      </span>
-                    </div>
-                  </div>
-                </LabelValueBlock>
+                  </LabelValueBlock>
+                </div>
               </div>
-              <span className="no-match-reason">Less than</span>
-              <span className="yes-match-reason">More than</span>
-              <span className="same-match-reason">Same</span>
             </div>
 
             {/* HEIGHT */}
@@ -471,7 +504,7 @@ const HomeScreen: React.FC = () => {
                   ? checkMatch(
                       "height",
                       maleProfiles[selectedMaleIndex]?.height,
-                      femaleProfiles[selectedFemaleIndex]?.height
+                      femaleProfiles[selectedFemaleIndex]?.height,
                     )
                   : ""
               }`}
@@ -480,7 +513,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-left">
                 <LabelValueBlock
                   label={"Height"}
-                  value={`${maleProfiles[selectedMaleIndex]?.height} cms`}
+                  value={`${maleProfiles[selectedMaleIndex]?.height}`}
                 />
               </div>
 
@@ -488,7 +521,7 @@ const HomeScreen: React.FC = () => {
               <div className="label-value-container-right">
                 <LabelValueBlock
                   label={"Height"}
-                  value={`${femaleProfiles[selectedFemaleIndex]?.height} cms`}
+                  value={`${femaleProfiles[selectedFemaleIndex]?.height}`}
                   align="right"
                 />
               </div>
@@ -524,7 +557,16 @@ const HomeScreen: React.FC = () => {
             </div>
 
             {/* EDUCATION */}
-            <div className="interactive-card">
+            <div
+              className={`interactive-card ${
+                showMatchLines
+                  ? getEducationStatusMatch(
+                      maleProfiles[selectedMaleIndex]?.education_status,
+                      femaleProfiles[selectedFemaleIndex]?.education_status,
+                    )
+                  : ""
+              }`}
+            >
               {/* Boy */}
               <div className="label-value-container-left">
                 <LabelValueBlock
@@ -576,7 +618,7 @@ const HomeScreen: React.FC = () => {
                   ? checkMatch(
                       "working_location",
                       maleProfiles[selectedMaleIndex]?.working_location,
-                      femaleProfiles[selectedFemaleIndex]?.working_location
+                      femaleProfiles[selectedFemaleIndex]?.working_location,
                     )
                   : ""
               }`}
@@ -614,7 +656,7 @@ const HomeScreen: React.FC = () => {
                   ? checkMatch(
                       "salary_pm",
                       maleProfiles[selectedMaleIndex]?.salary_pm,
-                      femaleProfiles[selectedFemaleIndex]?.salary_pm
+                      femaleProfiles[selectedFemaleIndex]?.salary_pm,
                     )
                   : ""
               }`}
@@ -622,7 +664,7 @@ const HomeScreen: React.FC = () => {
               {/* Boy */}
               <div className="label-value-container-left">
                 <LabelValueBlock
-                  label={"Salary PM"}
+                  label={"Income PM"}
                   value={maleProfiles[selectedMaleIndex]?.salary_pm}
                 />
               </div>
@@ -630,7 +672,7 @@ const HomeScreen: React.FC = () => {
               {/* Girl */}
               <div className="label-value-container-right">
                 <LabelValueBlock
-                  label={"Salary PM"}
+                  label={"Income PM"}
                   value={femaleProfiles[selectedFemaleIndex]?.salary_pm}
                   align="right"
                 />
@@ -646,18 +688,14 @@ const HomeScreen: React.FC = () => {
               )}
             </div>
 
-            {/* 1ST MARRIAGE / DIVORCEE */}
+            {/* STATUS */}
             <div
               className={`interactive-card ${
                 showMatchLines
                   ? checkMatch(
-                      "marriage_status",
-                      maleProfiles[selectedMaleIndex]?.is_first_marriage
-                        ? "first"
-                        : "not_first",
-                      femaleProfiles[selectedFemaleIndex]?.is_first_marriage
-                        ? "first"
-                        : "not_first"
+                      "status",
+                      maleProfiles[selectedMaleIndex]?.status,
+                      femaleProfiles[selectedFemaleIndex]?.status,
                     )
                   : ""
               }`}
@@ -665,18 +703,16 @@ const HomeScreen: React.FC = () => {
               {/* Boy */}
               <div className="label-value-container-left">
                 <LabelValueBlock
-                  label={"1st Marriage / Divorcee"}
-                  value={getMarriageStatusText(maleProfiles[selectedMaleIndex])}
+                  label={"Status"}
+                  value={maleProfiles[selectedMaleIndex]?.status}
                 />
               </div>
 
               {/* Girl */}
               <div className="label-value-container-right">
                 <LabelValueBlock
-                  label={"1st Marriage / Divorcee"}
-                  value={getMarriageStatusText(
-                    femaleProfiles[selectedFemaleIndex]
-                  )}
+                  label={"Status"}
+                  value={femaleProfiles[selectedFemaleIndex]?.status}
                   align="right"
                 />
               </div>
@@ -716,7 +752,7 @@ const HomeScreen: React.FC = () => {
                   ? checkMatch(
                       "mother_bari",
                       maleProfiles[selectedMaleIndex]?.mother_bari,
-                      femaleProfiles[selectedFemaleIndex]?.mother_bari
+                      femaleProfiles[selectedFemaleIndex]?.mother_bari,
                     )
                   : ""
               }`}

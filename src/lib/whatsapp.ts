@@ -28,8 +28,7 @@ type Profile = {
   mob1?: string;
   mob2?: string;
   email?: string;
-  is_divorced?: string; // Yes/No
-  is_first_marriage?: string; // Yes/No (if you kept it)
+  status?: string; // raw value from sheet
   any_other_details?: string;
   is_active?: string; // Yes/No
   photo_1?: string;
@@ -67,8 +66,7 @@ const LABELS: Record<keyof Profile, string> = {
   mob1: "Mobile 1",
   mob2: "Mobile 2",
   email: "Email",
-  is_divorced: "Divorced",
-  is_first_marriage: "First Marriage",
+  status: "Status",
   any_other_details: "Other Details",
   is_active: "Active",
   photo_1: "Photo 1",
@@ -105,7 +103,7 @@ const FULL_FIELDS: (keyof Profile)[] = [
   "mob1",
   "mob2",
   "email",
-  "is_divorced",
+  "status",
   "is_first_marriage",
   "any_other_details",
   // Put photos at end so WhatsApp preview shows links neatly
@@ -135,7 +133,7 @@ function line(label: string, value?: string | number) {
 function buildMessage(
   profile: Profile,
   fields: (keyof Profile)[],
-  title?: string
+  title?: string,
 ) {
   console.log(profile);
 
@@ -169,7 +167,7 @@ type PartialOptions = {
 
 export function buildPartialWhatsAppMessage(
   profile: Profile,
-  opts: PartialOptions = {}
+  opts: PartialOptions = {},
 ) {
   let fields: (keyof Profile)[];
 
@@ -215,7 +213,7 @@ export function buildPartialWhatsAppMessage(
  */
 export function normalizePhone(
   raw?: string,
-  defaultCountryCode = "91"
+  defaultCountryCode = "91",
 ): string | null {
   if (!raw) return null;
 

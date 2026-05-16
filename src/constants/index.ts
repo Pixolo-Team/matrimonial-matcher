@@ -32,7 +32,7 @@ export const columnMap: Record<string, string> = {
   Z: "mob2",
   AA: "email",
   AB: "is_divorced",
-  AC: "is_first_marriage",
+  AC: "status",
   AD: "any_other_details",
   AE: "photo_1",
   AF: "photo_2",
