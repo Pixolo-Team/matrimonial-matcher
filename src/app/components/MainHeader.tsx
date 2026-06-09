@@ -76,7 +76,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
                 }-${maleProfileItemIndex}`}
                 src={maleProfileItem.photo_1}
                 name={maleProfileItem.name ?? "Candidate Name"}
-                age={maleProfileItem.age}
+                subtitle={maleProfileItem.code_no}
                 isActive={selectedMaleIndex === maleProfileItemIndex}
                 onClick={() => setSelectedMaleIndex(maleProfileItemIndex)}
               />
@@ -124,7 +124,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
                 }-${femaleProfileItemIndex}`}
                 src={femaleProfileItem.photo_1}
                 name={femaleProfileItem.name ?? "Candidate Name"}
-                age={femaleProfileItem.age}
+                subtitle={femaleProfileItem.code_no}
                 isActive={selectedFemaleIndex === femaleProfileItemIndex}
                 onClick={() => setSelectedFemaleIndex(femaleProfileItemIndex)}
               />

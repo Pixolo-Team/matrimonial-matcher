@@ -8,10 +8,10 @@ import Image from "next/image";
 const HeaderUserChip: React.FC<{
   src: string;
   name: string;
-  age: string | number;
+  subtitle?: string | number;
   isActive: boolean; // Optional prop to indicate active state
   onClick: () => void;
-}> = ({ src, name, age, isActive = false, onClick }) => {
+}> = ({ src, name, subtitle, isActive = false, onClick }) => {
   const fallbackSrc = "/default-user.jpg";
 
   // Define States
@@ -41,9 +41,9 @@ const HeaderUserChip: React.FC<{
         <span className="block w-[120px] truncate text-lg font-semibold text-n-900">
           {name}
         </span>{" "}
-        {/* Age or placeholder */}
+        {/* Subtitle or placeholder */}
         <span className="text-sm font-normal text-n-700">
-          {age ? `${age} Years` : "-"}
+          {subtitle ? String(subtitle) : "-"}
         </span>{" "}
       </div>
     </div>

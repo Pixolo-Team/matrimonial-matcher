@@ -36,6 +36,30 @@ type Profile = {
   photo_3?: string;
 };
 
+function formatField(value?: string | number): string {
+  if (value === undefined || value === null) return "-";
+  const text = String(value).trim();
+  return text || "-";
+}
+
+function isOwnVenture(workType?: string): boolean {
+  const normalized = workType?.trim().toLowerCase() || "";
+  return normalized.includes("own venture");
+}
+
+function getProfileLabel(profile: Profile): "BOY" | "GIRL" {
+  const gender = profile.gender?.trim().toLowerCase() || "";
+  if (
+    gender.includes("bride") ||
+    gender.includes("girl") ||
+    gender.includes("female")
+  ) {
+    return "GIRL";
+  }
+
+  return "BOY";
+}
+
 // 1) Labels for human-readable output
 const LABELS: Record<keyof Profile, string> = {
   timestamp: "Submitted",
@@ -154,6 +178,48 @@ function buildMessage(
 // 6) Public: Full message (all fields in FULL_FIELDS)
 export function buildFullWhatsAppMessage(profile: Profile) {
   return buildMessage(profile, FULL_FIELDS);
+}
+
+export function buildAssociationWhatsAppMessage(
+  profile: Profile,
+  options?: {
+    includePhoto?: boolean;
+  },
+) {
+  const workSection = isOwnVenture(profile.working_or_own_venture)
+    ? "WORKS IN OWN VENTURE"
+    : `WORKING FOR: ${formatField(profile.employer)}
+WORKING AS: ${formatField(profile.designation)}`;
+  const photoSection = options?.includePhoto
+    ? `\nPHOTO: ${formatField(profile.photo_1)}`
+    : "";
+
+  return `MSG FROM BILLAWAR ASSOCIATION MUMBAI
+
+SHUB MANGALA SECTION
+
+Msg for:
+We forward herewith the details of ${getProfileLabel(profile)} as a suitable match for you.
+
+BAM SERIAL N0.: ${formatField(profile.code_no)}
+NAME: ${formatField(profile.name)}
+QUALIFICATIONS: ${formatField(profile.edu_qualifications)}
+${workSection}
+DATE OF BIRTH: ${formatField(profile.date_of_birth)}
+DAY OF BIRTH: ${formatField(profile.birth_day)}
+TIME OF BIRTH: ${formatField(profile.birth_time)}
+PLACE OF BIRTH: ${formatField(profile.birth_place)}
+NAKSHATRA: ${formatField(profile.nakshatra)}
+RASHI: ${formatField(profile.rashi)}
+HEIGHT: ${formatField(profile.height)}
+FATHER BARI: ${formatField(profile.father_bari)}
+MOTHER BARI: ${formatField(profile.mother_bari)}
+RESIDENCE PLACE: ${formatField(profile.address)}${photoSection}
+
+If you consider the match suitable, please get in touch with us for further details. In case you don’t want to proceed further, please do inform us.
+
+Contact any of our Shub Mangala Sub Committee members:
+Shri Mohan Kotian (9870060949), Shri Shankar D Poojary (9892198505), Shri Navinchandra Amin (9161666555), Smt.  Mohini Poojary (8779562358) or at The Billawar Association Mumbai, Billawa Bhavan, Santacruz, Mumbai on Tuesdays and Saturdays 4.00 pm to 7.00 pm.`;
 }
 
 // 7) Public: Partial message with flexible include/exclude

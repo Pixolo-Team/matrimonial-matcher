@@ -27,7 +27,7 @@ import {
 // OTHERS //
 import { fetchSheetData } from "@/lib/google-sheet";
 import {
-  buildPartialWhatsAppMessage,
+  buildAssociationWhatsAppMessage,
   buildWebWhatsAppLink,
 } from "@/lib/whatsapp";
 
@@ -91,47 +91,19 @@ const HomeScreen: React.FC = () => {
     // No user selected
     if (!selectedUser) return;
 
-    // Normalize gender and pick the opposite user
+    const selectedGender = selectedUser.gender?.toLowerCase() || "";
     const isGroom =
-      selectedUser.gender?.toLowerCase() === "groom" ||
-      selectedUser.gender?.toLowerCase() === "male" ||
-      selectedUser.gender?.toLowerCase() === "boy" ||
-      selectedUser.gender?.toLowerCase() === "groom (boy)";
+      selectedGender.includes("groom") ||
+      selectedGender.includes("male") ||
+      selectedGender.includes("boy");
 
     const receiverUser = isGroom
       ? femaleProfiles[selectedFemaleIndex]
       : maleProfiles[selectedMaleIndex];
 
     // Build message
-    const msg = buildPartialWhatsAppMessage(selectedUser, {
-      include:
-        type === "full"
-          ? [
-              "name",
-              "gender",
-              "date_of_birth",
-              "age",
-              "height",
-              "working_or_own_venture",
-              "designation",
-              "employer",
-              "working_location",
-              "photo_1",
-              "photo_2",
-              "photo_3",
-            ]
-          : [
-              "name",
-              "gender",
-              "date_of_birth",
-              "age",
-              "height",
-              "working_or_own_venture",
-              "designation",
-              "employer",
-              "working_location",
-            ],
-      title: `WE FORWARD HEREWITH DETAILS FOR A POSSIBLE MATCH FOR ${receiverUser.name} KINDLY GO THROUGH AND CONSIDER SUITABILITY AND DO CONTACT US IF YOU REQUIRE MORE DETAILS`,
+    const msg = buildAssociationWhatsAppMessage(selectedUser, {
+      includePhoto: type === "full",
     });
 
     // Send message to opposite party
@@ -650,17 +622,7 @@ const HomeScreen: React.FC = () => {
             </div>
 
             {/* SALARY */}
-            <div
-              className={`interactive-card ${
-                showMatchLines
-                  ? checkMatch(
-                      "salary_pm",
-                      maleProfiles[selectedMaleIndex]?.salary_pm,
-                      femaleProfiles[selectedFemaleIndex]?.salary_pm,
-                    )
-                  : ""
-              }`}
-            >
+            <div className="interactive-card">
               {/* Boy */}
               <div className="label-value-container-left">
                 <LabelValueBlock
@@ -677,15 +639,6 @@ const HomeScreen: React.FC = () => {
                   align="right"
                 />
               </div>
-
-              {/* Match Reasons */}
-              {showMatchLines && (
-                <>
-                  <span className="no-match-reason">Less than</span>
-                  <span className="yes-match-reason">More than</span>
-                  <span className="same-match-reason">Same</span>
-                </>
-              )}
             </div>
 
             {/* STATUS */}
