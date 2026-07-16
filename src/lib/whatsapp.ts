@@ -18,6 +18,7 @@ type Profile = {
   working_or_own_venture?: string; // Working / Own Venture
   designation?: string;
   employer?: string;
+  name_of_employer?: string;
   working_location?: string;
   salary_pm?: string; // "50k"
   father_name?: string;
@@ -188,7 +189,7 @@ export function buildAssociationWhatsAppMessage(
 ) {
   const workSection = isOwnVenture(profile.working_or_own_venture)
     ? "WORKS IN OWN VENTURE"
-    : `WORKING FOR: ${formatField(profile.employer)}
+    : `WORKING FOR: ${formatField(profile.name_of_employer)}
 WORKING AS: ${formatField(profile.designation)}`;
   const photoSection = options?.includePhoto
     ? `\nPHOTO: ${formatField(profile.photo_1)}`
