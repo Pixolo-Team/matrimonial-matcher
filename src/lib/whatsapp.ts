@@ -81,6 +81,7 @@ const LABELS: Record<keyof Profile, string> = {
   working_or_own_venture: "Work Type",
   designation: "Designation",
   employer: "Employer",
+  name_of_employer: "Name of Employer",
   working_location: "Working Location",
   salary_pm: "Salary (PM)",
   father_name: "Father Name",
