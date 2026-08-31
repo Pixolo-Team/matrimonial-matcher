@@ -15,7 +15,7 @@ import FullPageLoader from "@/app/components/FullPageLoader";
 import Toast from "@/app/components/Toast";
 
 // CONSTANTS //
-import { SHEET_URL } from "@/constants";
+import { ADMIN_WHATSAPP_NUMBER, SHEET_URL } from "@/constants";
 
 // UTILS //
 import {
@@ -44,6 +44,7 @@ const HomeScreen: React.FC = () => {
   const [selectedMaleIndex, setSelectedMaleIndex] = useState<number>(0);
   const [selectedFemaleIndex, setSelectedFemaleIndex] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const [sendToAdmin, setSendToAdmin] = useState<boolean>(false);
   const [compatibilityRating, setCompatibilityRating] = useState<number>(0);
   const [showMatchLines, setShowMatchLines] = useState<boolean>(true);
   const [toast, setToast] = useState<{
@@ -58,9 +59,11 @@ const HomeScreen: React.FC = () => {
 
   // Helper Functions
   /** Open Send Message Popup */
-  const initSendMessage = (user: Profile) => {
+  const initSendMessage = (user: Profile, toAdmin: boolean = false) => {
     // Set selected profile
     setSelectedUser(user);
+    // Track whether this message goes to the admin instead of the family
+    setSendToAdmin(toAdmin);
     // Show popup
     setSendMessageVisible(true);
   };
@@ -69,6 +72,8 @@ const HomeScreen: React.FC = () => {
   const closeSendPopup = () => {
     // Hide popup
     setSendMessageVisible(false);
+    // Reset admin target
+    setSendToAdmin(false);
     // TODO: Remove if not needed
     // setSelectedUser(null); // optional
   };
@@ -91,6 +96,18 @@ const HomeScreen: React.FC = () => {
     // No user selected
     if (!selectedUser) return;
 
+    // Build message
+    const msg = buildAssociationWhatsAppMessage(selectedUser, {
+      includePhoto: type === "full",
+    });
+
+    // Admin messages go to a fixed number instead of the opposite party
+    if (sendToAdmin) {
+      openWhatsApp(msg, ADMIN_WHATSAPP_NUMBER);
+      closeSendPopup();
+      return;
+    }
+
     const selectedGender = selectedUser.gender?.toLowerCase() || "";
     const isGroom =
       selectedGender.includes("groom") ||
@@ -100,11 +117,6 @@ const HomeScreen: React.FC = () => {
     const receiverUser = isGroom
       ? femaleProfiles[selectedFemaleIndex]
       : maleProfiles[selectedMaleIndex];
-
-    // Build message
-    const msg = buildAssociationWhatsAppMessage(selectedUser, {
-      includePhoto: type === "full",
-    });
 
     // Send message to opposite party
     openWhatsApp(msg, receiverUser.mob1);
@@ -346,6 +358,19 @@ const HomeScreen: React.FC = () => {
             >
               <Image src={ShareIcon} alt="share" />
               Send Girls Details
+            </Button>
+
+            {/* Secondary Button - send the girl's details to the admin */}
+            <Button
+              variant="outline"
+              className="bg-n-50 border-2 border-primary-500 hover:bg-primary-200 text-n-800 w-full h-18 text-base font-medium cursor-pointer"
+              onClick={() => {
+                if (femaleProfiles[selectedFemaleIndex])
+                  initSendMessage(femaleProfiles[selectedFemaleIndex], true);
+              }}
+            >
+              <Image src={ShareIcon} alt="share" />
+              Send to admin
             </Button>
           </div>
 
@@ -846,6 +871,19 @@ const HomeScreen: React.FC = () => {
             >
               <Image src={ShareIcon} alt="share" />
               Send Boys Details
+            </Button>
+
+            {/* Secondary Button - send the boy's details to the admin */}
+            <Button
+              variant="outline"
+              className="bg-n-50 border-2 border-primary-500 hover:bg-primary-200 text-n-800 w-full h-18 text-base font-medium cursor-pointer"
+              onClick={() => {
+                if (maleProfiles[selectedMaleIndex])
+                  initSendMessage(maleProfiles[selectedMaleIndex], true);
+              }}
+            >
+              <Image src={ShareIcon} alt="share" />
+              Send to admin
             </Button>
           </div>
         </div>
