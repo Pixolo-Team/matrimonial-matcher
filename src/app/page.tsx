@@ -17,6 +17,10 @@ import Toast from "@/app/components/Toast";
 // CONSTANTS //
 import { ADMIN_WHATSAPP_NUMBER, SHEET_URL } from "@/constants";
 
+// AUTH //
+const APP_PASSWORD = "Navinchandra14!$";
+const SESSION_KEY = "matrimonial_auth";
+
 // UTILS //
 import {
   calculateCompatibilityRating,
@@ -41,6 +45,7 @@ const HomeScreen: React.FC = () => {
   const [maleProfiles, setMaleProfiles] = useState<Profile[]>([]);
   const [femaleProfiles, setFemaleProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [selectedMaleIndex, setSelectedMaleIndex] = useState<number>(0);
   const [selectedFemaleIndex, setSelectedFemaleIndex] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
@@ -237,8 +242,13 @@ const HomeScreen: React.FC = () => {
 
   // UseEffect
   useEffect(() => {
-    // Fetch data
-    loadAndProcessData();
+    // If already authenticated (e.g. same session), load data immediately
+    const stored = sessionStorage.getItem(SESSION_KEY);
+    if (stored === "true") {
+      setIsAuthenticated(true);
+      loadAndProcessData();
+    }
+    // Otherwise keep loading=true so the password form stays visible
   }, [loadAndProcessData]);
 
   // Recalculate rating on every profile change
@@ -304,10 +314,20 @@ const HomeScreen: React.FC = () => {
 
   return (
     <>
-      {/* Full Page Loader */}
+      {/* Full Page Loader — shows password form first, then spinner */}
       <FullPageLoader
         isLoading={loading}
         text="Loading matrimonial profiles..."
+        requiresPassword={!isAuthenticated}
+        onPasswordSubmit={(pwd) => {
+          if (pwd === APP_PASSWORD) {
+            sessionStorage.setItem(SESSION_KEY, "true");
+            setIsAuthenticated(true);
+            loadAndProcessData();
+            return true;
+          }
+          return false;
+        }}
       />
 
       <div className="bg-n-200 min-h-screen z-10 relative before:content-[''] before:h-full before:w-[calc(50%-10px)] before:bg-n-50 before:rounded-3xl before:absolute before:top-0 before:left-0 before:-z-11 after:content-[''] after:h-full after:w-[calc(50%-10px)] after:bg-n-50 after:rounded-3xl after:absolute after:top-0 after:right-0 after:-z-10">
