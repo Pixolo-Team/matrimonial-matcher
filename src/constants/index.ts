@@ -48,3 +48,5 @@ export const columnMap: Record<string, string> = {
 
 export const SHEET_COLUMNS_URL =
   "https://pixoloproductions.com/api/billawar/sheet-columns.json";
+
+export const ADMIN_WHATSAPP_NUMBER = "9321123308";
